@@ -1,0 +1,250 @@
+// This file contains the configuration for your Wasp app.
+// It must be located in the root of your project.
+
+
+app XTasker {
+  wasp: {
+    version: "^0.15.0"
+  },
+  title: "XTasker",
+  client: {
+    rootComponent: import { MainLayout } from "@src/client/MainLayout",
+  },
+  auth: {
+    userEntity: User,
+    externalAuthEntity: Auth,
+    methods: { 
+      email: {},
+    },
+    onAuthFailedRedirectTo: "/login",
+    onAuthSucceededRedirectTo: "/",
+  },
+  server: {
+    setupFn: import { serverSetup } from "@src/server/server.ts",
+  },
+}
+
+route RootRoute { path: "/", to: AppPage }
+route DashboardRoute { path: "/dashboard", to: DashboardPage }
+route AgentsRoute { path: "/agents", to: AgentsPage }
+route FileUploadRoute { path: "/files", to: FileUploadPage }
+
+page AppPage {
+  authRequired: false,
+  component: import { LandingPage } from "@src/landing-page/LandingPage"
+}
+
+page DashboardPage {
+  authRequired: true,
+  component: import { MainAppContent } from "@src/client/App"
+}
+
+page AgentsPage {
+  authRequired: true,
+  component: import { AgentsPage } from "@src/agent-management/AgentsPage"
+}
+
+page FileUploadPage {
+  authRequired: true,
+  component: import { FileUploadPage } from "@src/file-upload/FileUploadPage"
+}
+
+route SignupRoute { path: "/signup", to: SignupPage }
+page SignupPage {
+  component: import { SignupPage } from "@src/auth/SignupPage",
+}
+
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import { LoginPage } from "@src/auth/LoginPage",
+}
+
+route EmailVerificationRoute {
+  path: "/email-verification",
+  to: EmailVerificationPage
+}
+page EmailVerificationPage {
+  component: import { EmailVerificationPage } from "@src/auth/email-and-pass/EmailVerificationPage",
+}
+
+route RequestPasswordResetRoute { path: "/request-password-reset", to: RequestPasswordResetPage }
+page RequestPasswordResetPage {
+  component: import { RequestPasswordResetPage } from "@src/auth/email-and-pass/RequestPasswordResetPage",
+}
+
+route PasswordResetRoute { path: "/password-reset", to: PasswordResetPage }
+page PasswordResetPage {
+  component: import { PasswordResetPage } from "@src/auth/email-and-pass/PasswordResetPage",
+}
+
+//#region LLM Configuration
+route LlmConfigurationRoute { path: "/llm-config", to: LlmConfigurationPage }
+page LlmConfigurationPage {
+  authRequired: true,
+  component: import LlmConfigurationPage from "@src/user/llm-config/LlmConfigurationPage"
+}
+
+action createLlmConfiguration {
+  fn: import { createLlmConfiguration } from "@src/user/operations",
+  entities: [User, LlmConfiguration]
+}
+
+action updateLlmConfiguration {
+  fn: import { updateLlmConfiguration } from "@src/user/operations",
+  entities: [User, LlmConfiguration]
+}
+
+action deleteLlmConfiguration {
+  fn: import { deleteLlmConfiguration } from "@src/user/operations",
+  entities: [User, LlmConfiguration]
+}
+
+query getAllLlmConfigurations {
+  fn: import { getAllLlmConfigurations } from "@src/user/operations",
+  entities: [User, LlmConfiguration]
+}
+
+query getLlmConfigurationById {
+  fn: import { getLlmConfigurationById } from "@src/user/operations",
+  entities: [User, LlmConfiguration]
+}
+//#endregion
+
+//#region File Management
+action generatePresignedUrl {
+  fn: import { generatePresignedUrl } from "@src/server/file-operations",
+  entities: [User, File]
+}
+
+action confirmFileUpload {
+  fn: import { confirmUpload } from "@src/server/file-operations",
+  entities: [User, File]
+}
+
+action deleteFile {
+  fn: import { deleteFile } from "@src/server/file-operations",
+  entities: [User, File]
+}
+
+query getUserFiles {
+  fn: import { getUserFiles } from "@src/server/file-operations",
+  entities: [User, File]
+}
+
+query getTaskFiles {
+  fn: import { getTaskFiles } from "@src/server/file-operations",
+  entities: [User, File, Task]
+}
+//#endregion
+
+//#region ElizaOS Agent Management
+entity ElizaAgent {=psl
+  id                        String          @id @default(uuid())
+  user                      User            @relation(fields: [userId], references: [id])
+  userId                    String
+  name                      String
+  username                  String?         @unique
+  system                    String
+  bio                       Json?
+  model                     String
+  provider                  String
+  settings                  Json?
+  enabled                   Boolean         @default(true)
+  status                    AgentStatus     @default(DRAFT)
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+psl=}
+
+entity AgentInteraction {=psl
+  id                        String          @id @default(uuid())
+  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
+  agentId                   String
+  taskId                    String?
+  type                      String
+  content                   String
+  metadata                  Json?
+  createdAt                 DateTime        @default(now())
+  
+  @@index([agentId])
+  @@index([taskId])
+psl=}
+
+entity AgentMemory {=psl
+  id                        String          @id @default(uuid())
+  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
+  agentId                   String
+  type                      String
+  content                   String
+  embedding                 Float[]
+  metadata                  Json?
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+  
+  @@index([agentId])
+psl=}
+
+entity AgentLog {=psl
+  id                        String          @id @default(uuid())
+  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
+  agentId                   String
+  level                     LogLevel
+  message                   String
+  context                   Json?
+  createdAt                 DateTime        @default(now())
+  
+  @@index([agentId])
+psl=}
+
+enum AgentStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ERROR
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+}
+
+action createElizaAgent {
+  fn: import { createAgent } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+action updateElizaAgent {
+  fn: import { updateAgent } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+action deleteElizaAgent {
+  fn: import { deleteAgent } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+query getElizaAgents {
+  fn: import { getUserAgents } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+query getElizaAgent {
+  fn: import { getAgentById } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+query getAgentLogs {
+  fn: import { getAgentLogs } from "@src/server/agent-operations",
+  entities: [User, AgentLog]
+}
+
+action createAgent {
+  fn: import { createAgent } from "@src/server/agent-operations",
+  entities: [User, ElizaAgent]
+}
+
+//#endregion
