@@ -1,70 +1,115 @@
-// This file contains the configuration for your Wasp app.
-// It must be located in the root of your project.
-
-
-app XTasker {
+app OpenSaaS {
   wasp: {
-    version: "^0.15.0"
+    version: "^0.17.0"
   },
-  title: "XTasker",
-  client: {
-    rootComponent: import { MainLayout } from "@src/client/MainLayout",
-  },
+
+  title: "My Open SaaS App",
+
+  head: [
+    "<link rel='icon' href='/favicon.ico' />",
+    "<meta charset='utf-8' />",
+    "<meta name='description' content='Your apps main description and features.' />",
+    "<meta name='author' content='Your (App) Name' />",
+    "<meta name='keywords' content='saas, solution, product, app, service' />",
+    
+    "<meta property='og:type' content='website' />",
+    "<meta property='og:title' content='Your Open SaaS App' />",
+    "<meta property='og:site_name' content='Your Open SaaS App' />",
+    "<meta property='og:url' content='https://your-saas-app.com' />",
+    "<meta property='og:description' content='Your apps main description and features.' />",
+    "<meta property='og:image' content='https://your-saas-app.com/public-banner.webp' />",
+    "<meta name='twitter:image' content='https://your-saas-app.com/public-banner.webp' />",
+    "<meta name='twitter:image:width' content='800' />",
+    "<meta name='twitter:image:height' content='400' />",
+    "<meta name='twitter:card' content='summary_large_image' />",
+    // TODO: You can put your Plausible analytics scripts below (https://docs.opensaas.sh/guides/analytics/):
+    // NOTE: Plausible does not use Cookies, so you can simply add the scripts here.
+    // Google, on the other hand, does, so you must instead add the script dynamically
+    // via the Cookie Consent component after the user clicks the "Accept" cookies button.
+    "<script defer data-domain='<your-site-id>' src='https://plausible.io/js/script.js'></script>",  // for production
+    "<script defer data-domain='<your-site-id>' src='https://plausible.io/js/script.local.js'></script>",  // for development
+  ],
+
+  // 🔐 Auth out of the box! https://wasp.sh/docs/auth/overview
   auth: {
     userEntity: User,
-    externalAuthEntity: Auth,
-    methods: { 
-      email: {},
+    methods: {
+      // NOTE: If you decide to not use email auth, make sure to also delete the related routes and pages below.
+      //   (RequestPasswordReset(Route|Page), PasswordReset(Route|Page), EmailVerification(Route|Page))
+      email: {
+        fromField: {
+          name: "Open SaaS App",
+          email: "me@example.com"
+        },
+        emailVerification: {
+          clientRoute: EmailVerificationRoute,
+          getEmailContentFn: import { getVerificationEmailContent } from "@src/auth/email-and-pass/emails",
+        },
+        passwordReset: {
+          clientRoute: PasswordResetRoute,
+          getEmailContentFn: import { getPasswordResetEmailContent } from "@src/auth/email-and-pass/emails",
+        },
+        userSignupFields: import { getEmailUserFields } from "@src/auth/userSignupFields",
+      },
+      // Uncomment to enable Google Auth (check https://wasp.sh/docs/auth/social-auth/google for setup instructions):
+      // google: { // Guide for setting up Auth via Google
+      //   userSignupFields: import { getGoogleUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getGoogleAuthConfig } from "@src/auth/userSignupFields",
+      // },
+      // Uncomment to enable GitHub Auth (check https://wasp.sh/docs/auth/social-auth/github for setup instructions):
+      // gitHub: {
+      //   userSignupFields: import { getGitHubUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getGitHubAuthConfig } from "@src/auth/userSignupFields",
+      // },
+      // Uncomment to enable Discord Auth (check https://wasp.sh/docs/auth/social-auth/discord for setup instructions):
+      // discord: {
+      //   userSignupFields: import { getDiscordUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getDiscordAuthConfig } from "@src/auth/userSignupFields"
+      // }
     },
     onAuthFailedRedirectTo: "/login",
-    onAuthSucceededRedirectTo: "/",
+    onAuthSucceededRedirectTo: "/demo-app",
   },
-  server: {
-    setupFn: import { serverSetup } from "@src/server/server.ts",
+
+  db: {
+    // Run `wasp db seed` to seed the database with the seed functions below:
+    seeds: [
+      // Populates the database with a bunch of fake users to work with during development.
+      import { seedMockUsers } from "@src/server/scripts/dbSeeds",
+    ]
+  },
+
+  client: {
+    rootComponent: import App from "@src/client/App",
+  },
+
+  emailSender: {
+    // NOTE: "Dummy" provider is just for local development purposes.
+    //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
+    //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers. Check out https://docs.opensaas.sh/guides/email-sending/ .
+    provider: Dummy,
+    defaultFrom: {
+      name: "Open SaaS App",
+      // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
+      email: "me@example.com"
+    },
   },
 }
 
-route RootRoute { path: "/", to: AppPage }
-route DashboardRoute { path: "/dashboard", to: DashboardPage }
-route AgentsRoute { path: "/agents", to: AgentsPage }
-route FileUploadRoute { path: "/files", to: FileUploadPage }
-
-page AppPage {
-  authRequired: false,
-  component: import { LandingPage } from "@src/landing-page/LandingPage"
+route LandingPageRoute { path: "/", to: LandingPage }
+page LandingPage {
+  component: import LandingPage from "@src/landing-page/LandingPage"
 }
 
-page DashboardPage {
-  authRequired: true,
-  component: import { MainAppContent } from "@src/client/App"
-}
-
-page AgentsPage {
-  authRequired: true,
-  component: import { AgentsPage } from "@src/agent-management/AgentsPage"
-}
-
-page FileUploadPage {
-  authRequired: true,
-  component: import { FileUploadPage } from "@src/file-upload/FileUploadPage"
+//#region Auth Pages
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import Login from "@src/auth/LoginPage"
 }
 
 route SignupRoute { path: "/signup", to: SignupPage }
 page SignupPage {
-  component: import { SignupPage } from "@src/auth/SignupPage",
-}
-
-route LoginRoute { path: "/login", to: LoginPage }
-page LoginPage {
-  component: import { LoginPage } from "@src/auth/LoginPage",
-}
-
-route EmailVerificationRoute {
-  path: "/email-verification",
-  to: EmailVerificationPage
-}
-page EmailVerificationPage {
-  component: import { EmailVerificationPage } from "@src/auth/email-and-pass/EmailVerificationPage",
+  component: import { Signup } from "@src/auth/SignupPage"
 }
 
 route RequestPasswordResetRoute { path: "/request-password-reset", to: RequestPasswordResetPage }
@@ -77,174 +122,185 @@ page PasswordResetPage {
   component: import { PasswordResetPage } from "@src/auth/email-and-pass/PasswordResetPage",
 }
 
-//#region LLM Configuration
-route LlmConfigurationRoute { path: "/llm-config", to: LlmConfigurationPage }
-page LlmConfigurationPage {
+route EmailVerificationRoute { path: "/email-verification", to: EmailVerificationPage }
+page EmailVerificationPage {
+  component: import { EmailVerificationPage } from "@src/auth/email-and-pass/EmailVerificationPage",
+}
+//#endregion
+
+//#region User
+route AccountRoute { path: "/account", to: AccountPage }
+page AccountPage {
   authRequired: true,
-  component: import LlmConfigurationPage from "@src/user/llm-config/LlmConfigurationPage"
+  component: import Account from "@src/user/AccountPage"
 }
 
-action createLlmConfiguration {
-  fn: import { createLlmConfiguration } from "@src/user/operations",
-  entities: [User, LlmConfiguration]
+query getPaginatedUsers {
+  fn: import { getPaginatedUsers } from "@src/user/operations",
+  entities: [User]
 }
 
-action updateLlmConfiguration {
-  fn: import { updateLlmConfiguration } from "@src/user/operations",
-  entities: [User, LlmConfiguration]
-}
-
-action deleteLlmConfiguration {
-  fn: import { deleteLlmConfiguration } from "@src/user/operations",
-  entities: [User, LlmConfiguration]
-}
-
-query getAllLlmConfigurations {
-  fn: import { getAllLlmConfigurations } from "@src/user/operations",
-  entities: [User, LlmConfiguration]
-}
-
-query getLlmConfigurationById {
-  fn: import { getLlmConfigurationById } from "@src/user/operations",
-  entities: [User, LlmConfiguration]
+action updateIsUserAdminById {
+  fn: import { updateIsUserAdminById } from "@src/user/operations",
+  entities: [User]
 }
 //#endregion
 
-//#region File Management
-action generatePresignedUrl {
-  fn: import { generatePresignedUrl } from "@src/server/file-operations",
-  entities: [User, File]
+//#region Demo AI App
+route DemoAppRoute { path: "/demo-app", to: DemoAppPage }
+page DemoAppPage {
+  authRequired: true,
+  component: import DemoAppPage from "@src/demo-ai-app/DemoAppPage"
 }
 
-action confirmFileUpload {
-  fn: import { confirmUpload } from "@src/server/file-operations",
-  entities: [User, File]
+action generateGptResponse {
+  fn: import { generateGptResponse } from "@src/demo-ai-app/operations",
+  entities: [User, Task, GptResponse]
 }
 
-action deleteFile {
-  fn: import { deleteFile } from "@src/server/file-operations",
-  entities: [User, File]
+action createTask {
+  fn: import { createTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
 }
 
-query getUserFiles {
-  fn: import { getUserFiles } from "@src/server/file-operations",
-  entities: [User, File]
+action deleteTask {
+  fn: import { deleteTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
 }
 
-query getTaskFiles {
-  fn: import { getTaskFiles } from "@src/server/file-operations",
-  entities: [User, File, Task]
+action updateTask {
+  fn: import { updateTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
+}
+
+query getGptResponses {
+  fn: import { getGptResponses } from "@src/demo-ai-app/operations",
+  entities: [User, GptResponse]
+}
+
+query getAllTasksByUser {
+  fn: import { getAllTasksByUser } from "@src/demo-ai-app/operations",
+  entities: [Task]
 }
 //#endregion
 
-//#region ElizaOS Agent Management
-entity ElizaAgent {=psl
-  id                        String          @id @default(uuid())
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
-  name                      String
-  username                  String?         @unique
-  system                    String
-  bio                       Json?
-  model                     String
-  provider                  String
-  settings                  Json?
-  enabled                   Boolean         @default(true)
-  status                    AgentStatus     @default(DRAFT)
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-
-  @@unique([userId, name])
-  @@index([userId])
-psl=}
-
-entity AgentInteraction {=psl
-  id                        String          @id @default(uuid())
-  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
-  agentId                   String
-  taskId                    String?
-  type                      String
-  content                   String
-  metadata                  Json?
-  createdAt                 DateTime        @default(now())
-  
-  @@index([agentId])
-  @@index([taskId])
-psl=}
-
-entity AgentMemory {=psl
-  id                        String          @id @default(uuid())
-  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
-  agentId                   String
-  type                      String
-  content                   String
-  embedding                 Float[]
-  metadata                  Json?
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-  
-  @@index([agentId])
-psl=}
-
-entity AgentLog {=psl
-  id                        String          @id @default(uuid())
-  agent                     ElizaAgent      @relation(fields: [agentId], references: [id])
-  agentId                   String
-  level                     LogLevel
-  message                   String
-  context                   Json?
-  createdAt                 DateTime        @default(now())
-  
-  @@index([agentId])
-psl=}
-
-enum AgentStatus {
-  DRAFT
-  ACTIVE
-  PAUSED
-  ERROR
+//#region Payment
+route PricingPageRoute { path: "/pricing", to: PricingPage }
+page PricingPage {
+  component: import PricingPage from "@src/payment/PricingPage"
 }
 
-enum LogLevel {
-  DEBUG
-  INFO
-  WARN
-  ERROR
+route CheckoutRoute { path: "/checkout", to: CheckoutPage }
+page CheckoutPage {
+  authRequired: true,
+  component: import Checkout from "@src/payment/CheckoutPage"
 }
 
-action createElizaAgent {
-  fn: import { createAgent } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+query getCustomerPortalUrl {
+  fn: import { getCustomerPortalUrl } from  "@src/payment/operations",
+  entities: [User]
 }
 
-action updateElizaAgent {
-  fn: import { updateAgent } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+action generateCheckoutSession {
+  fn: import { generateCheckoutSession } from "@src/payment/operations",
+  entities: [User]
 }
 
-action deleteElizaAgent {
-  fn: import { deleteAgent } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+api paymentsWebhook {
+  fn: import { paymentsWebhook } from "@src/payment/webhook",
+  entities: [User],
+  middlewareConfigFn: import { paymentsMiddlewareConfigFn } from "@src/payment/webhook",
+  httpRoute: (POST, "/payments-webhook")
+}
+//#endregion
+
+//#region File Upload
+route FileUploadRoute { path: "/file-upload", to: FileUploadPage }
+page FileUploadPage {
+  authRequired: true,
+  component: import FileUpload from "@src/file-upload/FileUploadPage"
 }
 
-query getElizaAgents {
-  fn: import { getUserAgents } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+action createFile {
+  fn: import { createFile } from "@src/file-upload/operations",
+  entities: [User, File]
 }
 
-query getElizaAgent {
-  fn: import { getAgentById } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+query getAllFilesByUser {
+  fn: import { getAllFilesByUser } from "@src/file-upload/operations",
+  entities: [User, File]
 }
 
-query getAgentLogs {
-  fn: import { getAgentLogs } from "@src/server/agent-operations",
-  entities: [User, AgentLog]
+query getDownloadFileSignedURL {
+  fn: import { getDownloadFileSignedURL } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+//#endregion
+
+//#region Analytics
+query getDailyStats {
+  fn: import { getDailyStats } from "@src/analytics/operations",
+  entities: [User, DailyStats]
 }
 
-action createAgent {
-  fn: import { createAgent } from "@src/server/agent-operations",
-  entities: [User, ElizaAgent]
+job dailyStatsJob {
+  executor: PgBoss,
+  perform: {
+    fn: import { calculateDailyStats } from "@src/analytics/stats"
+  },
+  schedule: {
+    cron: "0 * * * *" // every hour. useful in production
+    // cron: "* * * * *" // every minute. useful for debugging
+  },
+  entities: [User, DailyStats, Logs, PageViewSource]
+}
+//#endregion
+
+//#region Admin Dashboard
+route AdminRoute { path: "/admin", to: AnalyticsDashboardPage }
+page AnalyticsDashboardPage {
+  authRequired: true,
+  component: import AnalyticsDashboardPage from "@src/admin/dashboards/analytics/AnalyticsDashboardPage"
 }
 
+route AdminUsersRoute { path: "/admin/users", to: AdminUsersPage }
+page AdminUsersPage {
+  authRequired: true,
+  component: import AdminUsers from "@src/admin/dashboards/users/UsersDashboardPage"
+}
+
+route AdminSettingsRoute { path: "/admin/settings", to: AdminSettingsPage }
+page AdminSettingsPage {
+  authRequired: true,
+  component: import AdminSettings from "@src/admin/elements/settings/SettingsPage"
+}
+
+route AdminCalendarRoute { path: "/admin/calendar", to: AdminCalendarPage }
+page AdminCalendarPage {
+  authRequired: true,
+  component: import AdminCalendar from "@src/admin/elements/calendar/CalendarPage"
+}
+
+
+route AdminUIButtonsRoute { path: "/admin/ui/buttons", to: AdminUIButtonsPage }
+page AdminUIButtonsPage {
+  authRequired: true,
+  component: import AdminUI from "@src/admin/elements/ui-elements/ButtonsPage"
+}
+
+route NotFoundRoute { path: "*", to: NotFoundPage }
+page NotFoundPage {
+  component: import { NotFoundPage } from "@src/client/components/NotFoundPage"
+}
+//#endregion
+
+//#region Contact Form Messages
+// TODO: 
+// add functionality to allow users to send messages to admin
+// and make them accessible via the admin dashboard
+route AdminMessagesRoute { path: "/admin/messages", to: AdminMessagesPage }
+page AdminMessagesPage {
+  authRequired: true,
+  component: import AdminMessages from "@src/messages/MessagesPage"
+}
 //#endregion

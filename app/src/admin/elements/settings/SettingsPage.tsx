@@ -27,33 +27,31 @@ const SettingsPage = ({ user }: { user: AuthUser }) => {
 
   return (
     <DefaultLayout user={user}>
-      <div className='mx-auto max-w-270 font-mono'>
+      <div className='mx-auto max-w-270'>
         <Breadcrumb pageName='Settings' />
 
         <div className='grid grid-cols-5 gap-8'>
           <div className='col-span-5 xl:col-span-3'>
-            <Card className='border-cyber-purple-600 bg-cyber-black'>
+            <Card>
               <CardHeader>
-                <CardTitle className='text-cyber-purple-200 font-mono uppercase tracking-wider'>
-                  Personal Information
-                </CardTitle>
+                <CardTitle>Personal Information</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit}>
                   <div className='mb-5.5 flex flex-col gap-5.5 sm:flex-row'>
                     <div className='w-full sm:w-1/2'>
-                      <Label htmlFor='full-name' className='mb-3 block text-sm font-mono text-cyber-purple-300 uppercase tracking-wider'>
+                      <Label htmlFor='full-name' className='mb-3 block text-sm font-medium text-foreground'>
                         Full Name
                       </Label>
                       <div className='relative'>
-                        <User className='absolute left-4.5 top-2 h-5 w-5 text-cyber-purple-400' />
+                        <User className='absolute left-4.5 top-2 h-5 w-5 text-muted-foreground' />
                         <Input
-                          className='pl-11.5 border-cyber-purple-600 bg-cyber-black text-cyber-purple-200 placeholder:text-cyber-purple-400'
+                          className='pl-11.5'
                           type='text'
-                          name='full-name'
+                          name='fullName'
                           id='full-name'
-                          placeholder='Enter your full name'
-                          defaultValue='Admin User'
+                          placeholder='Devid Jhon'
+                          defaultValue='Devid Jhon'
                         />
                       </div>
                     </div>

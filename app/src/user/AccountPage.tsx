@@ -8,62 +8,51 @@ import { SubscriptionStatus, parsePaymentPlanId, prettyPaymentPlanName } from '.
 
 export default function AccountPage({ user }: { user: User }) {
   return (
-    <div className='mt-10 px-6 font-mono'>
-      <Card className='mb-4 border-cyber-purple-600 bg-cyber-black lg:m-8'>
+    <div className='mt-10 px-6'>
+      <Card className='mb-4 lg:m-8'>
         <CardHeader>
-          <CardTitle className='text-base font-mono uppercase tracking-wider text-cyber-purple-200'>
+          <CardTitle className='text-base font-semibold leading-6 text-foreground'>
             Account Information
           </CardTitle>
         </CardHeader>
         <CardContent className='p-0'>
           <div className='space-y-0'>
             {!!user.email && (
-              <div className='border-b border-cyber-purple-600 py-4 px-6'>
+              <div className='py-4 px-6'>
                 <div className='grid grid-cols-1 sm:grid-cols-3 sm:gap-4'>
-                  <dt className='text-sm font-mono uppercase tracking-wider text-cyber-purple-300'>
-                    Email address
-                  </dt>
-                  <dd className='mt-1 text-sm text-cyber-purple-200 sm:col-span-2 sm:mt-0'>
-                    {user.email}
-                  </dd>
+                  <dt className='text-sm font-medium text-muted-foreground'>Email address</dt>
+                  <dd className='mt-1 text-sm text-foreground sm:col-span-2 sm:mt-0'>{user.email}</dd>
                 </div>
               </div>
             )}
             {!!user.username && (
               <>
-                <div className='border-b border-cyber-purple-600 py-4 px-6'>
+                <Separator />
+                <div className='py-4 px-6'>
                   <div className='grid grid-cols-1 sm:grid-cols-3 sm:gap-4'>
-                    <dt className='text-sm font-mono uppercase tracking-wider text-cyber-purple-300'>
-                      Username
-                    </dt>
-                    <dd className='mt-1 text-sm text-cyber-purple-200 sm:col-span-2 sm:mt-0'>
-                      {user.username}
-                    </dd>
+                    <dt className='text-sm font-medium text-muted-foreground'>Username</dt>
+                    <dd className='mt-1 text-sm text-foreground sm:col-span-2 sm:mt-0'>{user.username}</dd>
                   </div>
                 </div>
               </>
             )}
-            <div className='border-b border-cyber-purple-600 py-4 px-6'>
+            <Separator />
+            <div className='py-4 px-6'>
               <div className='grid grid-cols-1 sm:grid-cols-3 sm:gap-4'>
-                <dt className='text-sm font-mono uppercase tracking-wider text-cyber-purple-300'>
-                  Your Plan
-                </dt>
-                <div className='sm:col-span-2'>
-                  <UserCurrentPaymentPlan
-                    subscriptionStatus={user.subscriptionStatus as SubscriptionStatus}
-                    subscriptionPlan={user.subscriptionPlan}
-                    datePaid={user.datePaid}
-                    credits={user.credits}
-                  />
-                </div>
+                <dt className='text-sm font-medium text-muted-foreground'>Your Plan</dt>
+                <UserCurrentPaymentPlan
+                  subscriptionStatus={user.subscriptionStatus as SubscriptionStatus}
+                  subscriptionPlan={user.subscriptionPlan}
+                  datePaid={user.datePaid}
+                  credits={user.credits}
+                />
               </div>
             </div>
-            <div className='border-b border-cyber-purple-600 py-4 px-6'>
+            <Separator />
+            <div className='py-4 px-6'>
               <div className='grid grid-cols-1 sm:grid-cols-3 sm:gap-4'>
-                <dt className='text-sm font-mono uppercase tracking-wider text-cyber-purple-300'>
-                  About
-                </dt>
-                <dd className='mt-1 text-sm text-cyber-purple-200 sm:col-span-2 sm:mt-0'>I'm a cool customer.</dd>
+                <dt className='text-sm font-medium text-muted-foreground'>About</dt>
+                <dd className='mt-1 text-sm text-foreground sm:col-span-2 sm:mt-0'>I'm a cool customer.</dd>
               </div>
             </div>
           </div>

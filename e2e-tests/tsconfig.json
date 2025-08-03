@@ -3,7 +3,7 @@
     "types": ["node"],
     "module": "commonjs",
     "target": "es5",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "sourceMap": false,
     "lib": ["DOM", "ES2015"]
   }

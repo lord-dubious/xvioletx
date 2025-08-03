@@ -103,8 +103,8 @@ XTasker is a task management SaaS application built with Wasp framework, integra
 
 **Task Management Interface:**
 - `TweetComposer.tsx` - Task creation interface (Twitter-like composer)
-- `AgentList.tsx` - List of available AI agents
-- `AgentForm.tsx` - Agent configuration and settings
+- `AgentList.tsx` - List of available AI agents (on hold for now)
+
 - `SchedulingView.tsx` - Calendar and scheduling interface
 - `TweetCalendar.tsx` - Task timeline view
 
@@ -212,7 +212,7 @@ LlmConfiguration (New)
 
 ### 1. Task Creation Flow
 1. User inputs task via `TweetComposer.tsx` interface
-2. ElizaOS agent processes natural language input
+2. ElizaOS agent processes natural language input (on hold)
 3. `generateLlmResponse` operation calls configured LLM provider
 4. Structured task data returned and stored
 5. UI updates with new task and AI suggestions

@@ -26,8 +26,6 @@ model User {
   contactFormMessages       ContactFormMessage[]
   tasks                     Task[]
   files                     File[]
-  llmResponses              LlmResponse[]
-  llmConfigurations         LlmConfiguration[]
 }
 
 model GptResponse {
@@ -41,58 +39,9 @@ model GptResponse {
   content                   String
 }
 
-model LlmResponse {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
-  task                      Task?           @relation(fields: [taskId], references: [id])
-  taskId                    String?
-
-  content                   String
-  model                     String
-  provider                  String
-  parameters                Json?
-  tokenCount                Int?
-  
-  // Relationship to LLM configuration used
-  llmConfiguration          LlmConfiguration? @relation(fields: [llmConfigurationId], references: [id])
-  llmConfigurationId        String?
-}
-
-model LlmConfiguration {
-  id                        String          @id @default(uuid())
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-
-  user                      User            @relation(fields: [userId], references: [id])
-  userId                    String
-
-  name                      String
-  providerType              LlmProviderType
-  apiKey                    String          // Encrypted
-  baseUrl                   String?
-  model                     String
-  parameters                Json?
-  customHeaders             Json?
-  
-  // Relationships
-  llmResponses              LlmResponse[]
-}
-
-enum LlmProviderType {
-  OPENAI
-  ANTHROPIC
-  LOCAL
-  CUSTOM
-}
-
 model Task {
   id                        String          @id @default(uuid())
   createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
 
   user                      User            @relation(fields: [userId], references: [id])
   userId                    String
@@ -100,34 +49,19 @@ model Task {
   description               String
   time                      String          @default("1")
   isDone                    Boolean         @default(false)
-  
-  // AI-enhanced metadata
-  category                  String?
-  priority                  String?         // 'low', 'medium', 'high', 'urgent'
-  timeEstimate              Int?            // in minutes
-  suggestedDependencies     String[]        @default([])
-  
-  // Relationships
-  llmResponses              LlmResponse[]
-  files                     File[]
-  agentInteractions         AgentInteraction[]
 }
 
 model File {
   id                        String          @id @default(uuid())
   createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
 
   user                      User            @relation(fields: [userId], references: [id])
   userId                    String
-  task                      Task?           @relation(fields: [taskId], references: [id])
-  taskId                    String?
 
   name                      String
   type                      String
-  key                       String          @unique
+  key                       String
   uploadUrl                 String
-  size                      Int?
 }
 
 model DailyStats {
@@ -176,4 +110,3 @@ model ContactFormMessage {
   isRead                    Boolean         @default(false)
   repliedAt                 DateTime?
 }
-

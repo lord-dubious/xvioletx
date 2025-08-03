@@ -5,24 +5,16 @@ import { AuthPageLayout } from './AuthPageLayout';
 export function Signup() {
   return (
     <AuthPageLayout>
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-center text-white mb-2">Create your account</h2>
-          <p className="text-center text-gray-400">Join XTasker and boost your productivity</p>
-        </div>
-        
-        <SignupForm />
-        
-        <div className="text-center">
-          <span className="text-gray-400">Already have an account? </span>
-          <WaspRouterLink 
-            to={routes.LoginRoute.to} 
-            className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
-          >
-            Sign in
-          </WaspRouterLink>
-        </div>
-      </div>
+      <SignupForm />
+      <br />
+      <span className='text-sm font-medium text-gray-900'>
+        I already have an account (
+        <WaspRouterLink to={routes.LoginRoute.to} className='underline'>
+          go to login
+        </WaspRouterLink>
+        ).
+      </span>
+      <br />
     </AuthPageLayout>
   );
 }

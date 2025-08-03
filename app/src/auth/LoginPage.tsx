@@ -5,35 +5,23 @@ import { AuthPageLayout } from './AuthPageLayout';
 export default function Login() {
   return (
     <AuthPageLayout>
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-center text-white mb-2">Sign in to your account</h2>
-          <p className="text-center text-gray-400">Welcome back to XTasker</p>
-        </div>
-        
-        <LoginForm />
-        
-        <div className="space-y-4 text-center">
-          <div className="text-sm">
-            <span className="text-gray-400">Don't have an account? </span>
-            <WaspRouterLink 
-              to={routes.SignupRoute.to} 
-              className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              Sign up
-            </WaspRouterLink>
-          </div>
-          
-          <div className="text-sm">
-            <WaspRouterLink 
-              to={routes.RequestPasswordResetRoute.to} 
-              className="font-medium text-gray-400 hover:text-gray-300 transition-colors"
-            >
-              Forgot your password?
-            </WaspRouterLink>
-          </div>
-        </div>
-      </div>
+      <LoginForm />
+      <br />
+      <span className='text-sm font-medium text-gray-900 dark:text-gray-900'>
+        Don't have an account yet?{' '}
+        <WaspRouterLink to={routes.SignupRoute.to} className='underline'>
+          go to signup
+        </WaspRouterLink>
+        .
+      </span>
+      <br />
+      <span className='text-sm font-medium text-gray-900'>
+        Forgot your password?{' '}
+        <WaspRouterLink to={routes.RequestPasswordResetRoute.to} className='underline'>
+          reset it
+        </WaspRouterLink>
+        .
+      </span>
     </AuthPageLayout>
   );
 }

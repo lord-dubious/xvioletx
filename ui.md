@@ -63,10 +63,10 @@ The application employs a responsive design approach, adapting its layout based 
 *   **Dashboard**: Overview of Twitter activity.
 *   **Compose**: Interface for creating and scheduling tweets.
 *   **Schedule**: Management of scheduled posts.
-*   **AI Agents**: Configuration for AI personas.
+*   **AI Agents**: Configuration for AI personas.(will be left blank for now )
 *   **Media Library**: Management of uploaded media files.
-*   **Settings**: Account and integration configurations.
-*   **"Coming Soon" Placeholder**: A consistent UI pattern for features under development, centered with a bold title and descriptive text.
+*   **Analytics**: Management of analytics data.
+
 
 ### 3.3. Interactive Elements
 

@@ -17,7 +17,7 @@ const Dashboard = ({ user }: { user: AuthUser }) => {
 
   return (
     <DefaultLayout user={user}>
-      <div className='relative font-mono'>
+      <div className='relative'>
         <div
           className={cn({
             'opacity-25': !stats,
@@ -47,11 +47,11 @@ const Dashboard = ({ user }: { user: AuthUser }) => {
         </div>
 
         {!stats && (
-          <div className='absolute inset-0 flex items-start justify-center bg-cyber-black/50'>
-            <div className='mt-20 text-center'>
-              <div className='h-8 w-8 animate-spin rounded-full border-4 border-cyber-purple-400 border-r-transparent'></div>
-              <p className='mt-2 text-sm text-cyber-purple-300 font-mono uppercase tracking-wider'>
-                Loading dashboard...
+          <div className='absolute inset-0 flex items-start justify-center bg-background/50'>
+            <div className='rounded-lg bg-card p-8 shadow-lg'>
+              <p className='text-2xl font-bold text-foreground'>No daily stats generated yet</p>
+              <p className='mt-2 text-sm text-muted-foreground'>
+                Stats will appear here once the daily stats job has run
               </p>
             </div>
           </div>

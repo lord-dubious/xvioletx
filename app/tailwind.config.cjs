@@ -8,11 +8,6 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				mono: [
-					'Courier New',
-					'Courier',
-					'monospace'
-				],
 				satoshi: [
 					'Satoshi',
 					'system-ui',
@@ -23,21 +18,6 @@ module.exports = {
 				current: 'currentColor',
 				transparent: 'transparent',
 				'black-2': '#010101',
-
-				// Cyberpunk Terminal Design System
-				'cyber-black': 'var(--cyber-black)',
-				'cyber-purple-900': 'var(--cyber-purple-900)',
-				'cyber-purple-800': 'var(--cyber-purple-800)',
-				'cyber-purple-700': 'var(--cyber-purple-700)',
-				'cyber-purple-600': 'var(--cyber-purple-600)',
-				'cyber-purple-500': 'var(--cyber-purple-500)',
-				'cyber-purple-400': 'var(--cyber-purple-400)',
-				'cyber-purple-300': 'var(--cyber-purple-300)',
-				'cyber-purple-200': 'var(--cyber-purple-200)',
-				'cyber-purple-100': 'var(--cyber-purple-100)',
-				'cyber-glow': 'var(--cyber-glow)',
-				'cyber-bright': 'var(--cyber-bright)',
-				'cyber-dim': 'var(--cyber-dim)',
 
 				// Pure ShadCN color system only
 				background: 'hsl(var(--background))',
