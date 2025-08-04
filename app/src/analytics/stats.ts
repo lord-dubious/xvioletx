@@ -10,7 +10,7 @@ import { SubscriptionStatus } from '../payment/plans';
 
 export type DailyStatsProps = { dailyStats?: DailyStats; weeklyStats?: DailyStats[]; isLoading?: boolean };
 
-export const calculateDailyStats: DailyStatsJob<never, void> = async (_args: never, context: any) => {
+export const calculateDailyStats: DailyStatsJob<never, void> = async (_args: never, context) => {
   const nowUTC = new Date(Date.now());
   nowUTC.setUTCHours(0, 0, 0, 0);
 

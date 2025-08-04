@@ -21,7 +21,7 @@ export type WebhookFunction = (
 // Middleware config type
 export interface MiddlewareConfig {
   delete: (middleware: string) => void;
-  set: (middleware: string, handler: any) => void;
+  set: (middleware: string, handler: unknown) => void;
 }
 
 export type MiddlewareConfigFunction = (config: MiddlewareConfig) => void;

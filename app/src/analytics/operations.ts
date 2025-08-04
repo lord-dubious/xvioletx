@@ -11,7 +11,7 @@ type DailyStatsValues = {
   weeklyStats: DailyStatsWithSources[];
 };
 
-export const getDailyStats: GetDailyStats<void, DailyStatsValues | undefined> = async (_args: void, context: any) => {
+export const getDailyStats: GetDailyStats<void, DailyStatsValues | undefined> = async (_args, context) => {
   if (!context.user) {
     throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
   }

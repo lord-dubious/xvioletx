@@ -33,16 +33,24 @@ export async function getSources() {
     ],
   });
 
-  let activeUsersPerReferrer: any[] = [];
+  type ActiveUsersBySource = {
+    source: string | undefined;
+    visitors: string | undefined;
+  };
+
+  let activeUsersPerReferrer: ActiveUsersBySource[] = [];
   if (response?.rows) {
-    activeUsersPerReferrer = response.rows.map((row) => {
-      if (row.dimensionValues && row.metricValues) {
-        return {
-          source: row.dimensionValues[0].value,
-          visitors: row.metricValues[0].value,
-        };
-      }
-    });
+    activeUsersPerReferrer = response.rows
+      .map((row) => {
+        if (row.dimensionValues && row.metricValues) {
+          return {
+            source: row.dimensionValues[0].value,
+            visitors: row.metricValues[0].value,
+          };
+        }
+        return null;
+      })
+      .filter((item): item is ActiveUsersBySource => item !== null);
   } else {
     throw new Error('No response from Google Analytics');
   }

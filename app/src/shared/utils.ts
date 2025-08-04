@@ -13,7 +13,7 @@ export function assertUnreachable(x: never): never {
 export function throttleWithTrailingInvocation(
   fn: () => void,
   delayInMilliseconds: number
-): ((...args: any[]) => void) & { cancel: () => void } {
+): ((...args: unknown[]) => void) & { cancel: () => void } {
   let fnLastCallTime: number | null = null;
   let trailingInvocationTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let isTrailingInvocationPending = false;
