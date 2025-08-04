@@ -9,11 +9,12 @@ export function assertUnreachable(x: never): never {
 
 /**
  * Allows for throttling a function call while still allowing the last invocation to be executed after the throttle delay ends.
+ * Note: The returned function accepts arguments but they are intentionally ignored since the original function takes no parameters.
  */
 export function throttleWithTrailingInvocation(
   fn: () => void,
   delayInMilliseconds: number
-): ((...args: unknown[]) => void) & { cancel: () => void } {
+): ((...args: unknown[]) => void) & { cancel: () => void } { // args are ignored, fn is called with no parameters
   let fnLastCallTime: number | null = null;
   let trailingInvocationTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let isTrailingInvocationPending = false;

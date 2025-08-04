@@ -63,9 +63,9 @@ const getConfig = () => {
                   throw new Error('Google Analytics ID is missing');
                 }
                 window.dataLayer = window.dataLayer || [];
-                function gtag(..._args: unknown[]) {
-                  (window.dataLayer as unknown[]).push(arguments);
-                }
+                const gtag = (...args: unknown[]) => {
+                  (window.dataLayer as unknown[]).push(args);
+                };
                 gtag('js', new Date());
                 gtag('config', GA_ANALYTICS_ID);
 

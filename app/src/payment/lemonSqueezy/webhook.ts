@@ -1,10 +1,10 @@
-// import { type MiddlewareConfigFn, HttpError } from 'wasp/server';
+import { type MiddlewareConfigFn } from 'wasp/server';
+// import { HttpError } from 'wasp/server';
 // import { type PaymentsWebhook } from 'wasp/server/api';
 import { type PrismaClient } from '@prisma/client';
 import express from 'express';
 import type { Request, Response } from 'express';
 import { type WebhookContext, type WebhookFunction } from '../types';
-import { type MiddlewareConfigFn } from 'wasp/server';
 
 // Mock HttpError for development
 class HttpError extends Error {
