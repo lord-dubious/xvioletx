@@ -1,7 +1,7 @@
 ---
-trigger: model_decision
+type: "agent_requested"
+description: "This document gives a quick rundown on how Wasp interacts with the database using Prisma, defines Wasp Entities, and explains the rules for creating and using Wasp Operations (Queries and Actions)."
 ---
-
 # 3. Database, Entities, and Operations
 
 This document gives a quick rundown on how Wasp interacts with the database using Prisma, defines Wasp Entities, and explains the rules for creating and using Wasp Operations (Queries and Actions).
@@ -48,6 +48,7 @@ See the Wasp Data Model docs for more info [wasp-overview.mdc](mdc:template/app/
 - Operations automatically handle data fetching, caching (for queries), and updates.
 - Operations reference Entities (defined in [schema.prisma](mdc:schema.prisma) ) to establish proper data access patterns and dependencies.
 - Example definitions in [main.wasp](mdc:main.wasp):
+
   ```wasp
   query getTasks {
     // Points to the implementation function
@@ -75,60 +76,68 @@ See the Wasp Data Model docs for more info [wasp-overview.mdc](mdc:template/app/
 - **Client-Side Query Usage:** Use Wasp's `useQuery` hook from `wasp/client/operations` to fetch data.
   - `import { useQuery } from 'wasp/client/operations';`
   - `const { data, isLoading, error } = useQuery(getQueryName, { queryArgs });`
-- **Client-Side Action Usage:** Call actions *directly* using `async`/`await`. **DO NOT USE** the `useAction` hook unless you specifically need optimistic UI updates (see [advanced-troubleshooting.mdc](mdc:template/app/.cursor/rules/advanced-troubleshooting.mdc)).
+- **Client-Side Action Usage:** Call actions _directly_ using `async`/`await`. **DO NOT USE** the `useAction` hook unless you specifically need optimistic UI updates (see [advanced-troubleshooting.mdc](mdc:template/app/.cursor/rules/advanced-troubleshooting.mdc)).
   - `import { myAction } from 'wasp/client/operations';`
   - `const result = await myAction({ actionArgs });`
-- **Example Operation Implementation (`src/features/tasks/operations.ts`):
+- \*\*Example Operation Implementation (`src/features/tasks/operations.ts`):
+
   ```typescript
-  import { HttpError } from 'wasp/server'
-  import type { GetTasks, CreateTask } from 'wasp/server/operations'
-  import type { Task } from 'wasp/entities'
+  import { HttpError } from "wasp/server";
+  import type { GetTasks, CreateTask } from "wasp/server/operations";
+  import type { Task } from "wasp/entities";
 
   // Type annotations come from Wasp based on main.wasp definitions
   export const getTasks: GetTasks<void, Task[]> = async (_args, context) => {
     if (!context.user) {
-      throw new HttpError(401, 'Not authorized');
+      throw new HttpError(401, "Not authorized");
     }
     // Access entities via context
     return context.entities.Task.findMany({
-      where: { userId: context.user.id }
+      where: { userId: context.user.id },
     });
-  }
+  };
 
-  type CreateTaskInput = Pick<Task, 'description'>
-  export const createTask: CreateTask<CreateTaskInput, Task> = async (args, context) => {
+  type CreateTaskInput = Pick<Task, "description">;
+  export const createTask: CreateTask<CreateTaskInput, Task> = async (
+    args,
+    context
+  ) => {
     if (!context.user) {
-      throw new HttpError(401, 'Not authorized');
+      throw new HttpError(401, "Not authorized");
     }
 
     return context.entities.Task.create({
       data: {
         description: args.description,
         userId: context.user.id,
-      }
+      },
     });
-  }
+  };
   ```
 
 ## Prisma Enum Value Imports
 
-- **Rule:** When you need to use Prisma enum members as *values* (e.g., `MyEnum.VALUE` in logic or comparisons) in your server or client code, import the enum directly from `@prisma/client`, not from `wasp/entities`.
+- **Rule:** When you need to use Prisma enum members as _values_ (e.g., `MyEnum.VALUE` in logic or comparisons) in your server or client code, import the enum directly from `@prisma/client`, not from `wasp/entities`.
   - ✅ `import { TransactionType } from '@prisma/client';` (Use as `TransactionType.EXPENSE`)
-  - ❌ `import { TransactionType } from 'wasp/entities';` (This only imports the *type* for annotations, not the runtime *value*)
+  - ❌ `import { TransactionType } from 'wasp/entities';` (This only imports the _type_ for annotations, not the runtime _value_)
 
 ## Server-Side Error Handling
 
 - Throw `HttpError` from `wasp/server` for expected errors (e.g., unauthorized, not found, bad input) to send structured responses to the client.
 - Log unexpected errors for debugging.
 - Example:
-  ```typescript
-  import { HttpError } from 'wasp/server'
-  import type { UpdateTask } from 'wasp/server/operations'
-  import type { Task } from 'wasp/entities'
 
-  export const updateTask: UpdateTask<{ id: number; data: Partial<Task> }, Task> = async (args, context) => {
+  ```typescript
+  import { HttpError } from "wasp/server";
+  import type { UpdateTask } from "wasp/server/operations";
+  import type { Task } from "wasp/entities";
+
+  export const updateTask: UpdateTask<
+    { id: number; data: Partial<Task> },
+    Task
+  > = async (args, context) => {
     if (!context.user) {
-      throw new HttpError(401, 'Not authorized');
+      throw new HttpError(401, "Not authorized");
     }
 
     try {
@@ -137,7 +146,7 @@ See the Wasp Data Model docs for more info [wasp-overview.mdc](mdc:template/app/
       });
 
       if (!task) {
-        throw new HttpError(404, 'Task not found');
+        throw new HttpError(404, "Task not found");
       }
 
       return context.entities.Task.update({
@@ -149,9 +158,12 @@ See the Wasp Data Model docs for more info [wasp-overview.mdc](mdc:template/app/
         throw error; // Re-throw known HttpErrors
       }
       // Log unexpected errors
-      console.error('Failed to update task:', error);
+      console.error("Failed to update task:", error);
       // Throw a generic server error for unexpected issues
-      throw new HttpError(500, 'Failed to update task due to an internal error.');
+      throw new HttpError(
+        500,
+        "Failed to update task due to an internal error."
+      );
     }
-  }
+  };
   ```

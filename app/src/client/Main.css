@@ -138,35 +138,51 @@
   }
 
   .dark {
-    --background: 210 50% 5%;
-    --foreground: 0 0% 98%;
-    --card: 210 50% 5%;
-    --card-foreground: 0 0% 98%;
+    /* Cyberpunk Terminal Design System */
+    --background: 0 0% 0%; /* Pure black */
+    --foreground: 0 0% 100%; /* Pure white */
+    --card: 0 0% 0%; /* Black cards */
+    --card-foreground: 0 0% 98%; /* White text on cards */
     --card-accent: 31 57% 93%;
     --card-accent-foreground: 0 0% 3.9%;
     --card-subtle: 233 24% 15%;
     --card-subtle-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 31 57% 93%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 209 91% 61%;
-    --secondary-foreground: 0 0% 98%;
+    --primary: 270 100% 70%; /* Bright purple #9933ff */
+    --primary-foreground: 0 0% 0%; /* Black text on purple */
+    --secondary: 270 20% 5%; /* Very dark purple */
+    --secondary-foreground: 0 0% 98%; /* Nearly white */
     --secondary-muted: 210 67% 94%;
     --secondary-muted-foreground: 0 0% 3.9%;
-    --muted: 210 100% 13%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 31 57% 93%;
-    --accent-foreground: 210 100% 13%;
+    --muted: 0 0% 2%; /* Very dark gray */
+    --muted-foreground: 0 0% 63.9%; /* Medium gray text */
+    --accent: 270 20% 5%; /* Same as secondary */
+    --accent-foreground: 0 0% 98%; /* Nearly white */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --success: 141 71% 48%;
     --success-foreground: 0 0% 98%;
     --warning: 36 100% 50%;
     --warning-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 270 50% 30%; /* Purple borders */
+    --input: 270 20% 5%; /* Dark purple inputs */
+    --ring: 270 100% 70%; /* Bright purple focus rings */
+
+    /* Cyberpunk specific colors */
+    --cyber-black: #000000;
+    --cyber-purple-900: #0a0015;
+    --cyber-purple-800: #150025;
+    --cyber-purple-700: #200040;
+    --cyber-purple-600: #2d0055;
+    --cyber-purple-500: #3d0077;
+    --cyber-purple-400: #5500aa;
+    --cyber-purple-300: #7700dd;
+    --cyber-purple-200: #9933ff;
+    --cyber-purple-100: #bb66ff;
+    --cyber-glow: #7700dd;
+    --cyber-bright: #9933ff;
+    --cyber-dim: #3d0077;
   }
 }
 
@@ -175,6 +191,88 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+  }
+}
+
+@layer components {
+  /* Cyberpunk Terminal Design System Components */
+  .terminal-card {
+    @apply bg-black border border-purple-600 shadow-lg;
+    animation: terminal-flare 8s infinite;
+  }
+
+  .terminal-card:hover {
+    @apply shadow-purple-500/20;
+    box-shadow: 0 0 20px rgba(153, 51, 255, 0.3);
+  }
+
+  .cyber-input {
+    @apply bg-black border border-purple-600 text-white font-mono;
+    @apply focus:border-purple-400 focus:ring-1 focus:ring-purple-400;
+    @apply placeholder:text-gray-500;
+    font-size: clamp(0.75rem, 2vw, 1rem);
+    padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px);
+  }
+
+  .cyber-button {
+    @apply bg-black border border-purple-600 text-white font-mono uppercase;
+    @apply hover:border-purple-400 hover:shadow-purple-500/20;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply transition-all duration-200;
+    letter-spacing: 0.5px;
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+    padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 10px);
+  }
+
+  .cyber-button:hover:not(:disabled) {
+    box-shadow: 0 0 15px rgba(153, 51, 255, 0.4);
+  }
+
+  .cyber-tab {
+    @apply bg-black border border-purple-700 text-white font-mono uppercase;
+    @apply hover:border-purple-500 transition-all duration-200;
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+  }
+
+  .cyber-tab.active {
+    @apply border-purple-400 text-purple-200;
+    box-shadow: 0 0 10px rgba(153, 51, 255, 0.3);
+  }
+
+  .terminal-glow {
+    @apply text-purple-200 font-mono uppercase;
+    letter-spacing: 1px;
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
+    text-shadow: 0 0 10px rgba(153, 51, 255, 0.5);
+  }
+}
+
+@layer utilities {
+  /* Cyberpunk animations */
+  @keyframes terminal-flare {
+    0%, 100% { border-color: rgb(45 0 85); }
+    50% { border-color: rgb(85 0 170); }
+  }
+
+  @keyframes subtle-light-sweep {
+    0% { box-shadow: 0 0 5px rgba(153, 51, 255, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(153, 51, 255, 0.4); }
+    100% { box-shadow: 0 0 5px rgba(153, 51, 255, 0.2); }
+  }
+
+  @keyframes terminalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-terminal-fade-in {
+    animation: terminalFadeIn 0.3s ease-out;
   }
 }

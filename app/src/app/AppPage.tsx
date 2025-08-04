@@ -18,27 +18,87 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { cn } from '../lib/utils';
 import type { GeneratedSchedule, Task as ScheduleTask, TaskItem, TaskPriority } from './schedule';
+import TweetComposer from './TweetComposer';
+import MobileTweetComposer from './MobileTweetComposer';
+import { type MediaFile } from './hooks/useMediaUpload';
 
-export default function DemoAppPage() {
+export default function AppPage() {
+  const [isMobileComposerOpen, setIsMobileComposerOpen] = useState(false);
+
+  const handleTweetSubmit = (content: string, mediaFiles?: MediaFile[]) => {
+    console.log('Tweet submitted:', {
+      content,
+      mediaCount: mediaFiles?.length || 0,
+      uploadedMedia: mediaFiles?.filter(f => f.uploaded).length || 0
+    });
+    // TODO: Implement tweet submission logic with media files
+    // This will connect to the backend operations in future tasks
+
+    // Close mobile composer after submission
+    setIsMobileComposerOpen(false);
+  };
+
   return (
     <div className='py-10 lg:mt-10'>
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mx-auto max-w-4xl text-center'>
           <h2 className='mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl'>
-            <span className='text-primary'>AI</span> Day Scheduler
+            <span className='text-primary'>XTasker</span> AI Task Manager
           </h2>
         </div>
         <p className='mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-muted-foreground'>
-          This example app uses OpenAI's chat completions with function calling to return a structured JSON
-          object. Try it out, enter your day's tasks, and let AI do the rest!
+          AI-powered task management with Twitter-like interface. Create, schedule, and manage your tasks with intelligent assistance.
         </p>
-        {/* begin AI-powered Todo List */}
+
+        {/* Tweet Composer Section */}
+        <div className='my-8 space-y-6'>
+          {/* Desktop Tweet Composer */}
+          <div className='hidden md:block'>
+            <TweetComposer
+              onTweetSubmit={handleTweetSubmit}
+              placeholder="What task would you like to create or schedule?"
+            />
+          </div>
+
+          {/* Mobile Floating Action Button */}
+          <div className='md:hidden fixed bottom-6 right-6 z-50'>
+            <Button
+              onClick={() => setIsMobileComposerOpen(true)}
+              size="lg"
+              className='h-14 w-14 rounded-full bg-black border border-purple-600 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300'
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </Button>
+          </div>
+
+          {/* Mobile Tweet Composer Modal */}
+          <MobileTweetComposer
+            onTweetSubmit={handleTweetSubmit}
+            placeholder="What task would you like to create or schedule?"
+            isOpen={isMobileComposerOpen}
+            onClose={() => setIsMobileComposerOpen(false)}
+          />
+        </div>
+
+        {/* Original Task Management Section */}
         <Card className='my-8 bg-muted/10'>
           <CardContent className='sm:w-[90%] md:w-[70%] lg:w-[50%] py-10 px-6 mx-auto my-8 space-y-10'>
             <NewTaskForm handleCreateTask={createTask} />
           </CardContent>
         </Card>
-        {/* end AI-powered Todo List */}
       </div>
     </div>
   );
@@ -118,8 +178,9 @@ function NewTaskForm({ handleCreateTask }: { handleCreateTask: typeof createTask
     try {
       await handleCreateTask({ description });
       setDescription('');
-    } catch (err: any) {
-      window.alert('Error: ' + (err.message || 'Something went wrong'));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+      window.alert('Error: ' + errorMessage);
     }
   };
 
@@ -132,8 +193,9 @@ function NewTaskForm({ handleCreateTask }: { handleCreateTask: typeof createTask
       if (response) {
         setResponse(response as unknown as GeneratedSchedule);
       }
-    } catch (err: any) {
-      window.alert('Error: ' + (err.message || 'Something went wrong'));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+      window.alert('Error: ' + errorMessage);
     } finally {
       setIsPlanGenerating(false);
     }
@@ -170,7 +232,7 @@ function NewTaskForm({ handleCreateTask }: { handleCreateTask: typeof createTask
 
       <div className='space-y-10 col-span-full'>
         {isTasksLoading && <div className='text-muted-foreground'>Loading...</div>}
-        {tasks!! && tasks.length > 0 ? (
+        {tasks && tasks.length > 0 ? (
           <div className='space-y-4'>
             {tasks.map((task: Task) => (
               <Todo
@@ -222,7 +284,7 @@ function NewTaskForm({ handleCreateTask }: { handleCreateTask: typeof createTask
         )}
       </Button>
 
-      {!!response && (
+      {response && (
         <div className='flex flex-col'>
           <h3 className='text-lg font-semibold text-foreground mb-4'>Today's Schedule</h3>
           <Schedule schedule={response} />
@@ -312,7 +374,7 @@ function Schedule({ schedule }: { schedule: GeneratedSchedule }) {
   return (
     <div className='flex flex-col gap-6 py-6'>
       <div className='space-y-4'>
-        {!!schedule.tasks ? (
+        {schedule.tasks ? (
           schedule.tasks
             .map((task) => <TaskCard key={task.name} task={task} taskItems={schedule.taskItems} />)
             .sort((a, b) => {
@@ -349,7 +411,7 @@ function TaskCard({ task, taskItems }: { task: ScheduleTask; taskItems: TaskItem
         </CardTitle>
       </CardHeader>
       <CardContent className='pt-0'>
-        {!!taskItems ? (
+        {taskItems ? (
           <ul className='space-y-2'>
             {taskItems.map((taskItem) => {
               if (taskItem.taskName === task.name) {

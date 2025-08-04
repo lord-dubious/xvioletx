@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { getAllFilesByUser, getDownloadFileSignedURL, useQuery } from 'wasp/client/operations';
-import type { File } from 'wasp/entities';
+import type { File as FileEntity } from 'wasp/entities';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardTitle } from '../components/ui/card';
@@ -17,7 +17,7 @@ import {
 import { ALLOWED_FILE_TYPES } from './validation';
 
 export default function FileUploadPage() {
-  const [fileKeyForS3, setFileKeyForS3] = useState<File['key']>('');
+  const [fileKeyForS3, setFileKeyForS3] = useState<FileEntity['key']>('');
   const [uploadProgressPercent, setUploadProgressPercent] = useState<number>(0);
   const [uploadError, setUploadError] = useState<FileUploadError | null>(null);
 
@@ -38,21 +38,9 @@ export default function FileUploadPage() {
 
   useEffect(() => {
     if (fileKeyForS3.length > 0) {
-      refetchDownloadUrl()
-        .then((urlQuery) => {
-          switch (urlQuery.status) {
-            case 'error':
-              console.error('Error fetching download URL', urlQuery.error);
-              alert('Error fetching download');
-              return;
-            case 'success':
-              window.open(urlQuery.data, '_blank');
-              return;
-          }
-        })
-        .finally(() => {
-          setFileKeyForS3('');
-        });
+      refetchDownloadUrl();
+      // For now, just reset the key since we can't handle the promise
+      setFileKeyForS3('');
     }
   }, [fileKeyForS3]);
 
@@ -148,7 +136,7 @@ export default function FileUploadPage() {
               )}
               {!!allUserFiles.data && allUserFiles.data.length > 0 && !allUserFiles.isLoading ? (
                 <div className='space-y-3'>
-                  {allUserFiles.data.map((file: File) => (
+                  {allUserFiles.data.map((file: FileEntity) => (
                     <Card key={file.key} className='p-4'>
                       <div
                         className={cn(

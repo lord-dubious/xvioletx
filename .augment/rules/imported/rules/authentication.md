@@ -1,8 +1,8 @@
 ---
-trigger: model_decision
+type: "agent_requested"
+description: "This document gives a quick rundown on how authentication is configured and used within the Wasp application."
 ---
-
-# 4. Authentication
+authentication
 
 This document gives a quick rundown on how authentication is configured and used within the Wasp application.
 
@@ -10,9 +10,10 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
 
 ## Wasp Auth Setup
 
-- Wasp provides built-in authentication with minimal configuration via the Wasp config file. 
+- Wasp provides built-in authentication with minimal configuration via the Wasp config file.
 - Wasp generates all necessary auth routes, middleware, and UI components based on the configuration.
 - Example auth configuration in [main.wasp](mdc:main.wasp):
+
   ```wasp
   app myApp {
     // ... other config
@@ -65,6 +66,7 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
 ## Wasp Auth Rules
 
 - **User Model ( [schema.prisma](mdc:schema.prisma) ):**
+
   - Wasp Auth methods handle essential identity fields (like `email`, `password hash`, `provider IDs`, `isVerified`) internally. These are stored in separate Prisma models managed by Wasp (`AuthProvider`, `AuthProviderData`).
   - Your Prisma `User` model (specified in [main.wasp](mdc:main.wasp) as `auth.userEntity`) typically **only needs the `id` field** for Wasp to link the auth identity.
     ```prisma
@@ -77,21 +79,24 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
       // timeZone        String? @default("UTC")
     }
     ```
-  - **Avoid adding** `email`, `emailVerified`, `password`, `username`, or provider-specific ID fields directly to *your* `User` model in [schema.prisma](mdc:schema.prisma) unless you have very specific customization needs that require overriding Wasp's default behavior and managing these fields manually.
-  - If you need frequent access to an identity field like `email` or `username` for *any* user (not just the logged-in one), see the **Recommendation** in the "Wasp Auth User Fields" section below.
+  - **Avoid adding** `email`, `emailVerified`, `password`, `username`, or provider-specific ID fields directly to _your_ `User` model in [schema.prisma](mdc:schema.prisma) unless you have very specific customization needs that require overriding Wasp's default behavior and managing these fields manually.
+  - If you need frequent access to an identity field like `email` or `username` for _any_ user (not just the logged-in one), see the **Recommendation** in the "Wasp Auth User Fields" section below.
 
 - **Auth Pages:**
+
   - When initially creating Auth pages (Login, Signup), use the pre-built components provided by Wasp for simplicity:
     - `import { LoginForm, SignupForm } from 'wasp/client/auth';`
     - These components work with the configured auth methods in [main.wasp](mdc:main.wasp).
     - You can customize their appearance or build completely custom forms if needed.
 
 - **Protected Routes/Pages:**
+
   - Use the `useAuth` hook from `wasp/client/auth` to access the current user's data and check authentication status.
   - Redirect or show alternative content if the user is not authenticated.
+
   ```typescript
-  import { useAuth } from 'wasp/client/auth';
-  import { Redirect } from 'wasp/client/router'; // Or use Link
+  import { useAuth } from "wasp/client/auth";
+  import { Redirect } from "wasp/client/router"; // Or use Link
 
   const MyProtectedPage = () => {
     const { data: user, isLoading, error } = useAuth(); // Returns AuthUser | null
@@ -124,7 +129,9 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
   - `const username = getUsername(user); // Returns string | null`
 - **Standard User Entities:** Remember that standard `User` entities fetched via `context.entities.User.findMany()` or similar in server code **DO NOT** automatically include these auth identity fields (`email`, `username`, etc.) by default. They only contain the fields defined directly in your [schema.prisma](mdc:schema.prisma) `User` model.
 - **Recommendation:**
-  - If you need *frequent* access to an identity field like `email` or `username` for *any* user (not just the currently logged-in one accessed via `context.user` or `useAuth`) and want to query it easily via `context.entities.User`, consider this approach:
+
+  - If you need _frequent_ access to an identity field like `email` or `username` for _any_ user (not just the currently logged-in one accessed via `context.user` or `useAuth`) and want to query it easily via `context.entities.User`, consider this approach:
+
     1.  **Add the field directly** to your `User` model in [schema.prisma](mdc:schema.prisma).
         ```prisma
         model User {
@@ -134,21 +141,23 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
         }
         ```
     2.  **Ensure this field is populated correctly** when the user signs up or updates their profile. You can do this through the `userSignupFields` property in the wasp config file for each auth method.
+
         ```wasp
         //main.wasp
         auth: {
           userEntity: User,
           methods: {
-            email: { 
+            email: {
               //...
               userSignupFields: import { getEmailUserFields } from "@src/auth/userSignupFields"
             },
           }
         }
         ```
+
         ```ts
         //userSignupFields.ts
-        import { defineUserSignupFields } from 'wasp/auth/providers/types';
+        import { defineUserSignupFields } from "wasp/auth/providers/types";
 
         const userDataSchema = z.object({
           email: z.string(),
@@ -158,9 +167,10 @@ See the Wasp Auth docs for available methods and complete guides [wasp-overview.
           email: (data) => {
             const userData = userDataSchema.parse(data);
             return userData.email;
-          }
-        })
+          },
+        });
         ```
+
     3.  This makes the field (`email` in this example) a standard, queryable field on your `User` entity, accessible via `context.entities.User`, separate from the `AuthUser`'s identity structure.
 
 - **Common Issue:** If auth isn't working, first verify the `auth` configuration in [main.wasp](mdc:main.wasp) is correct and matches your intent (correct `userEntity`, enabled `methods`, `onAuthFailedRedirectTo`). Ensure environment variables for social providers are set if applicable. Check the Wasp server logs for errors.

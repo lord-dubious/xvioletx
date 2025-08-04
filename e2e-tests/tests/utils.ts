@@ -34,7 +34,7 @@ export const logUserIn = async ({ page, user }: { page: Page; user: User }) => {
     clickLogin,
   ]);
 
-  await page.waitForURL('**/demo-app');
+  await page.waitForURL('**/app');
 };
 
 export const signUserUp = async ({ page, user }: { page: Page; user: User }) => {

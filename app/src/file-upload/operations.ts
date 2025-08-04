@@ -24,9 +24,9 @@ export const createFile: CreateFile<
     s3UploadUrl: string;
     s3UploadFields: Record<string, string>;
   }
-> = async (rawArgs, context) => {
+> = async (rawArgs: CreateFileInput, context: any) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
 
   const { fileType, fileName } = ensureArgsSchemaOrThrowHttpError(createFileInputSchema, rawArgs);
@@ -53,9 +53,9 @@ export const createFile: CreateFile<
   };
 };
 
-export const getAllFilesByUser: GetAllFilesByUser<void, File[]> = async (_args, context) => {
+export const getAllFilesByUser: GetAllFilesByUser<void, File[]> = async (_args: void, context: any) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
   return context.entities.File.findMany({
     where: {
@@ -76,7 +76,7 @@ type GetDownloadFileSignedURLInput = z.infer<typeof getDownloadFileSignedURLInpu
 export const getDownloadFileSignedURL: GetDownloadFileSignedURL<
   GetDownloadFileSignedURLInput,
   string
-> = async (rawArgs, _context) => {
+> = async (rawArgs: GetDownloadFileSignedURLInput, _context: any) => {
   const { key } = ensureArgsSchemaOrThrowHttpError(getDownloadFileSignedURLInputSchema, rawArgs);
   return await getDownloadFileSignedURLFromS3({ key });
 };

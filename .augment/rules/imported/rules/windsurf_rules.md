@@ -1,7 +1,5 @@
 ---
-trigger: always_on
-description: Guidelines for creating and maintaining Windsurf rules to ensure consistency and effectiveness.
-globs: .windsurf/rules/*.md
+type: "always_apply"
 ---
 
 - **Required Rule Structure:**

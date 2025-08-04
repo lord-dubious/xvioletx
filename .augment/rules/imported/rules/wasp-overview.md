@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+type: "always_apply"
 ---
 
 # 1. Wasp Overview and Core Concepts

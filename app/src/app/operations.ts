@@ -6,6 +6,8 @@ import type {
   CreateTask,
   DeleteTask,
   GenerateGptResponse,
+  GenerateTweet,
+  ImproveTweet,
   GetAllTasksByUser,
   GetGptResponses,
   UpdateTask,
@@ -13,7 +15,7 @@ import type {
 import * as z from 'zod';
 import { SubscriptionStatus } from '../payment/plans';
 import { ensureArgsSchemaOrThrowHttpError } from '../server/validation';
-import { GeneratedSchedule, TaskPriority } from './schedule';
+import type { GeneratedSchedule, TaskPriority } from './schedule';
 
 const openAi = setUpOpenAi();
 function setUpOpenAi(): OpenAI {
@@ -35,12 +37,13 @@ export const generateGptResponse: GenerateGptResponse<GenerateGptResponseInput, 
   rawArgs,
   context
 ) => {
+  const { hours } = ensureArgsSchemaOrThrowHttpError(generateGptResponseInputSchema, rawArgs);
+
   if (!context.user) {
     throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
   }
 
-  const { hours } = ensureArgsSchemaOrThrowHttpError(generateGptResponseInputSchema, rawArgs);
-  const tasks = await context.entities.Task.findMany({
+  const tasks = await context.entities.Task!.findMany({
     where: {
       user: {
         id: context.user.id,
@@ -54,7 +57,7 @@ export const generateGptResponse: GenerateGptResponse<GenerateGptResponseInput, 
     throw new HttpError(500, 'Encountered a problem in communication with OpenAI');
   }
 
-  const createResponse = context.entities.GptResponse.create({
+  const createResponse = context.entities.GptResponse!.create({
     data: {
       user: { connect: { id: context.user.id } },
       content: JSON.stringify(generatedSchedule),
@@ -73,7 +76,7 @@ export const generateGptResponse: GenerateGptResponse<GenerateGptResponseInput, 
   // Think about which option you prefer for your app and edit the code accordingly.
   if (!isUserSubscribed(context.user)) {
     if (context.user.credits > 0) {
-      const decrementCredit = context.entities.User.update({
+      const decrementCredit = context.entities.User!.update({
         where: { id: context.user.id },
         data: {
           credits: {
@@ -107,13 +110,15 @@ const createTaskInputSchema = z.object({
 type CreateTaskInput = z.infer<typeof createTaskInputSchema>;
 
 export const createTask: CreateTask<CreateTaskInput, Task> = async (rawArgs, context) => {
+  const { description } = ensureArgsSchemaOrThrowHttpError(createTaskInputSchema, rawArgs);
+
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
 
   const { description } = ensureArgsSchemaOrThrowHttpError(createTaskInputSchema, rawArgs);
 
-  const task = await context.entities.Task.create({
+  const task = await context.entities.Task!.create({
     data: {
       description,
       user: { connect: { id: context.user.id } },
@@ -133,12 +138,12 @@ type UpdateTaskInput = z.infer<typeof updateTaskInputSchema>;
 
 export const updateTask: UpdateTask<UpdateTaskInput, Task> = async (rawArgs, context) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
 
   const { id, isDone, time } = ensureArgsSchemaOrThrowHttpError(updateTaskInputSchema, rawArgs);
 
-  const task = await context.entities.Task.update({
+  const task = await context.entities.Task!.update({
     where: {
       id,
       user: {
@@ -162,12 +167,12 @@ type DeleteTaskInput = z.infer<typeof deleteTaskInputSchema>;
 
 export const deleteTask: DeleteTask<DeleteTaskInput, Task> = async (rawArgs, context) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
 
   const { id } = ensureArgsSchemaOrThrowHttpError(deleteTaskInputSchema, rawArgs);
 
-  const task = await context.entities.Task.delete({
+  const task = await context.entities.Task!.delete({
     where: {
       id,
       user: {
@@ -183,9 +188,9 @@ export const deleteTask: DeleteTask<DeleteTaskInput, Task> = async (rawArgs, con
 //#region Queries
 export const getGptResponses: GetGptResponses<void, GptResponse[]> = async (_args, context) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
-  return context.entities.GptResponse.findMany({
+  return context.entities.GptResponse!.findMany({
     where: {
       user: {
         id: context.user.id,
@@ -196,9 +201,9 @@ export const getGptResponses: GetGptResponses<void, GptResponse[]> = async (_arg
 
 export const getAllTasksByUser: GetAllTasksByUser<void, Task[]> = async (_args, context) => {
   if (!context.user) {
-    throw new HttpError(401);
+    throw new HttpError(401, 'Unauthorized');
   }
-  return context.entities.Task.findMany({
+  return context.entities.Task!.findMany({
     where: {
       user: {
         id: context.user.id,
@@ -298,3 +303,119 @@ async function generateScheduleWithGpt(tasks: Task[], hours: number): Promise<Ge
   const gptResponse = completion?.choices[0]?.message?.tool_calls?.[0]?.function.arguments;
   return gptResponse !== undefined ? JSON.parse(gptResponse) : null;
 }
+
+// Tweet Generation Operations
+const generateTweetInputSchema = z.object({
+  prompt: z.string().optional(),
+  context: z.string().optional(),
+});
+
+type GenerateTweetInput = z.infer<typeof generateTweetInputSchema>;
+
+export const generateTweet: GenerateTweet<GenerateTweetInput, string> = async (
+  rawArgs,
+  context
+) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
+  }
+
+  const { prompt, context: userContext } = ensureArgsSchemaOrThrowHttpError(generateTweetInputSchema, rawArgs);
+
+  try {
+    const completion = await openAi.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a creative social media expert. Generate engaging, authentic tweets that are:
+- Concise and impactful (under 280 characters)
+- Engaging and conversation-starting
+- Authentic and human-like
+- Appropriate for professional social media
+- Include relevant hashtags when appropriate
+${userContext ? `\nContext: ${userContext}` : ''}`,
+        },
+        {
+          role: 'user',
+          content: prompt || 'Generate an engaging tweet about productivity and technology.',
+        },
+      ],
+      max_tokens: 150,
+      temperature: 0.8,
+    });
+
+    const generatedTweet = completion.choices[0]?.message?.content;
+    if (!generatedTweet) {
+      throw new HttpError(500, 'Failed to generate tweet content');
+    }
+
+    return generatedTweet.trim();
+  } catch (error) {
+    console.error('Error generating tweet:', error);
+    throw new HttpError(500, 'Failed to generate tweet');
+  }
+};
+
+const improveTweetInputSchema = z.object({
+  content: z.string(),
+  improvementType: z.enum(['engagement', 'clarity', 'professional', 'creative']).optional(),
+});
+
+type ImproveTweetInput = z.infer<typeof improveTweetInputSchema>;
+
+export const improveTweet: ImproveTweet<ImproveTweetInput, string> = async (
+  rawArgs,
+  context
+) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
+  }
+
+  const { content, improvementType = 'engagement' } = ensureArgsSchemaOrThrowHttpError(improveTweetInputSchema, rawArgs);
+
+  if (!content.trim()) {
+    throw new HttpError(400, 'Tweet content is required for improvement');
+  }
+
+  try {
+    const improvementPrompts = {
+      engagement: 'Make this tweet more engaging and likely to get interactions',
+      clarity: 'Make this tweet clearer and easier to understand',
+      professional: 'Make this tweet more professional and polished',
+      creative: 'Make this tweet more creative and unique'
+    };
+
+    const completion = await openAi.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a social media expert. ${improvementPrompts[improvementType]}.
+Keep the improved tweet:
+- Under 280 characters
+- Authentic and human-like
+- Maintain the original intent and message
+- Add relevant hashtags if beneficial
+- Improve readability and impact`,
+        },
+        {
+          role: 'user',
+          content: `Original tweet: "${content}"\n\nPlease improve this tweet.`,
+        },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+    });
+
+    const improvedTweet = completion.choices[0]?.message?.content;
+    if (!improvedTweet) {
+      throw new HttpError(500, 'Failed to improve tweet content');
+    }
+
+    return improvedTweet.trim();
+  } catch (error) {
+    console.error('Error improving tweet:', error);
+    throw new HttpError(500, 'Failed to improve tweet');
+  }
+};

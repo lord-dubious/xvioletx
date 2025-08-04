@@ -1,7 +1,7 @@
 ---
-trigger: model_decision
+type: "agent_requested"
+description: " Advanced Features & Troubleshooting"
 ---
-
 # 6. Advanced Features & Troubleshooting
 
 This document covers advanced Wasp capabilities like Jobs, API Routes, and Middleware, along with performance optimization tips and common troubleshooting steps.
@@ -41,7 +41,7 @@ These features are configured in [main.wasp](mdc:main.wasp).
     httpRoute: (POST, "/webhooks/stripe"),
     // Optional: Grant entity access
     entities: [User, Payment],
-    // Optional: Apply middleware config function 
+    // Optional: Apply middleware config function
     // middlewareConfigFn: import { apiMiddleware } from "@src/apis"
     // Optional: If auth is enabled, this will default to true and provide a context.user
     // object. If you do not wish to attempt to parse the JWT in the Authorization Header
@@ -77,7 +77,7 @@ These features are configured in [main.wasp](mdc:main.wasp).
   - Use `useCallback` to memoize functions passed down as props to child components (especially event handlers).
 - **Optimistic UI Updates (Actions):**
   - For actions where perceived speed is critical (e.g., deleting an item, marking as complete), consider using Wasp's `useAction` hook (from `wasp/client/operations`) with `optimisticUpdates`.
-  - This updates the client-side cache (affecting relevant `useQuery` results) *before* the action completes on the server, providing instant feedback.
+  - This updates the client-side cache (affecting relevant `useQuery` results) _before_ the action completes on the server, providing instant feedback.
   - **Use Sparingly:** Only implement optimistic updates where the action is highly likely to succeed and the instant feedback significantly improves UX. Remember to handle potential server-side failures gracefully (Wasp helps revert optimistic updates on error).
   - See the Wasp Actions docs for more info [wasp-overview.mdc](mdc:template/app/.cursor/rules/wasp-overview.mdc)
 
@@ -100,9 +100,11 @@ These features are configured in [main.wasp](mdc:main.wasp).
   - If using PostgreSQL, ensure the database server is running.
   - Check the `.env.server` file for the correct `DATABASE_URL`.
 - **Build/Runtime Errors:**
+
   - Check import paths carefully (Wasp vs. relative vs. `@src/` rules, see [project-conventions.mdc](mdc:template/app/.cursor/rules/project-conventions.mdc)).
   - Ensure all dependencies are installed (`npm install`).
   - Check the Wasp server console and the browser's developer console for specific error messages.
 
   ### Referencing Wasp Documentation
+
   - Search for and reference applicable LLM-optimized docs, available in [wasp-overview.mdc](mdc:template/app/.cursor/rules/wasp-overview.mdc)

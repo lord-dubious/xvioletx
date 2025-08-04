@@ -242,7 +242,7 @@ const UsersTable = () => {
         {isLoading && <LoadingSpinner />}
         {!!data?.users &&
           data?.users?.length > 0 &&
-          data.users.map((user) => (
+          data.users.map((user: User) => (
             <div key={user.id} className='grid grid-cols-9 gap-4 py-4.5 px-4 md:px-6 '>
               <div className='col-span-3 flex items-center'>
                 <div className='flex flex-col gap-1 '>

@@ -1,6 +1,6 @@
 import { type Prisma } from '@prisma/client';
 import { type User } from 'wasp/entities';
-import { HttpError, prisma } from 'wasp/server';
+import { HttpError } from 'wasp/server';
 import { type GetPaginatedUsers, type UpdateIsUserAdminById } from 'wasp/server/operations';
 import * as z from 'zod';
 import { SubscriptionStatus } from '../payment/plans';
@@ -27,7 +27,7 @@ export const updateIsUserAdminById: UpdateIsUserAdminById<UpdateUserAdminByIdInp
     throw new HttpError(403, 'Only admins are allowed to perform this operation');
   }
 
-  return context.entities.User.update({
+  return context.entities.User!.update({
     where: { id },
     data: { isAdmin },
   });
@@ -70,7 +70,7 @@ export const getPaginatedUsers: GetPaginatedUsers<GetPaginatedUsersInput, GetPag
   } = ensureArgsSchemaOrThrowHttpError(getPaginatorArgsSchema, rawArgs);
 
   const includeUnsubscribedUsers = !!subscriptionStatus?.some((status) => status === null);
-  const desiredSubscriptionStatuses = subscriptionStatus?.filter((status) => status !== null);
+  const desiredSubscriptionStatuses = subscriptionStatus?.filter((status) => status !== null) as string[] | undefined;
 
   const pageSize = 10;
 
@@ -113,9 +113,9 @@ export const getPaginatedUsers: GetPaginatedUsers<GetPaginatedUsersInput, GetPag
     },
   };
 
-  const [pageOfUsers, totalUsers] = await prisma.$transaction([
-    context.entities.User.findMany(userPageQuery),
-    context.entities.User.count({ where: userPageQuery.where }),
+  const [pageOfUsers, totalUsers] = await Promise.all([
+    context.entities.User!.findMany(userPageQuery),
+    context.entities.User!.count({ where: userPageQuery.where }),
   ]);
   const totalPages = Math.ceil(totalUsers / pageSize);
 

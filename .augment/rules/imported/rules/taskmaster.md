@@ -1,7 +1,5 @@
 ---
-trigger: model_decision
-description: Comprehensive reference for Taskmaster MCP tools and CLI commands.
-globs: **/*
+type: "agent_requested"
 ---
 
 # Taskmaster Tool & Command Reference

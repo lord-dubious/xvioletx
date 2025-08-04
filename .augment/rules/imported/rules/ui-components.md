@@ -1,8 +1,7 @@
 ---
-trigger: model_decision
-description: Describes where the ui components built on top with Shadcn UI exist, how they are customized, and Wasp specific rules concerning how new ShadCN UI components should be installed
+type: "agent_requested"
+description: "ui-components"
 ---
-
 Only ShadCN UI version 2.3.0 should be used with Wasp at the moment. Due to dependency conflicts Wasp cannot be used with Tailwindcss v4, which the newer version of Shadcn depends on. 
 
 Shadcn has already been setup with this project template, so there is no need to install it. All the ShadCN specific components exist in [src/components/ui](../../src/components/ui/)

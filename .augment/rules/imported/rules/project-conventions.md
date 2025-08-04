@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+type: "always_apply"
 ---
 
 # 2. Project Conventions and Rules

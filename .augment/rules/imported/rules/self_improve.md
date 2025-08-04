@@ -1,9 +1,7 @@
 ---
-trigger: always_on
-description: Guidelines for continuously improving Windsurf rules based on emerging code patterns and best practices.
-globs: **/*
+type: "agent_requested"
+description: "self improve"
 ---
-
 - **Rule Improvement Triggers:**
   - New code patterns not covered by existing rules
   - Repeated similar implementations across files
