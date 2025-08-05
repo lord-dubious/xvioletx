@@ -3,7 +3,8 @@
 import { type PrismaClient } from '@prisma/client';
 import express from 'express';
 import type { Request, Response } from 'express';
-import { type WebhookContext, type WebhookFunction, type MiddlewareConfigFunction } from '../types';
+import { type WebhookContext, type WebhookFunction } from '../types';
+import { type MiddlewareConfigFn } from 'wasp/server';
 
 // Mock HttpError for development
 class HttpError extends Error {
@@ -86,8 +87,8 @@ function constructStripeEvent(request: express.Request): Stripe.Event {
   }
 }
 
-export const stripeMiddlewareConfigFn: MiddlewareConfigFunction = (
-  middlewareConfig: { delete: (name: string) => void; set: (name: string, handler: unknown) => void }
+export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
+  middlewareConfig
 ) => {
   // We need to delete the default 'express.json' middleware and replace it with 'express.raw' middleware
   // because webhook data in the body of the request as raw JSON, not as JSON in the body of the request.

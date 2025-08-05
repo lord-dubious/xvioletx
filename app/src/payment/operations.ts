@@ -17,7 +17,7 @@ type GenerateCheckoutSessionInput = z.infer<typeof generateCheckoutSessionSchema
 export const generateCheckoutSession: GenerateCheckoutSession<
   GenerateCheckoutSessionInput,
   CheckoutSession
-> = async (rawPaymentPlanId: GenerateCheckoutSessionInput, context: any) => {
+> = async (rawPaymentPlanId, context) => {
   if (!context.user) {
     throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
   }
@@ -44,7 +44,7 @@ export const generateCheckoutSession: GenerateCheckoutSession<
   };
 };
 
-export const getCustomerPortalUrl: GetCustomerPortalUrl<void, string | null> = async (_args: void, context: any) => {
+export const getCustomerPortalUrl: GetCustomerPortalUrl<void, string | null> = async (_args, context) => {
   if (!context.user) {
     throw new HttpError(401, 'Only authenticated users are allowed to perform this operation');
   }

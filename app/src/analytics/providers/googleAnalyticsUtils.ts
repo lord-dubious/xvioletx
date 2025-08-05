@@ -33,16 +33,24 @@ export async function getSources() {
     ],
   });
 
-  let activeUsersPerReferrer: any[] = [];
+  type ActiveUsersBySource = {
+    source: string | undefined;
+    visitors: string | undefined;
+  };
+
+  let activeUsersPerReferrer: ActiveUsersBySource[] = [];
   if (response?.rows) {
-    activeUsersPerReferrer = response.rows.map((row) => {
-      if (row.dimensionValues && row.metricValues) {
-        return {
-          source: row.dimensionValues[0].value,
-          visitors: row.metricValues[0].value,
-        };
-      }
-    });
+    activeUsersPerReferrer = response.rows
+      .map((row) => {
+        if (row.dimensionValues && row.metricValues) {
+          return {
+            source: row.dimensionValues[0].value,
+            visitors: row.metricValues[0].value,
+          };
+        }
+        return null;
+      })
+      .filter((item): item is ActiveUsersBySource => item !== null);
   } else {
     throw new Error('No response from Google Analytics');
   }
@@ -76,8 +84,7 @@ async function getTotalPageViews() {
     ],
   });
   let totalViews = 0;
-  if (response?.rows) {
-    // @ts-ignore
+  if (response?.rows?.[0]?.metricValues?.[0]?.value) {
     totalViews = parseInt(response.rows[0].metricValues[0].value);
   } else {
     throw new Error('No response from Google Analytics');
@@ -119,10 +126,8 @@ async function getPrevDayViewsChangePercent() {
   let viewsFromDayBeforeYesterday;
 
   if (response?.rows && response.rows.length === 2) {
-    // @ts-ignore
-    viewsFromYesterday = response.rows[0].metricValues[0].value;
-    // @ts-ignore
-    viewsFromDayBeforeYesterday = response.rows[1].metricValues[0].value;
+    viewsFromYesterday = response.rows[0]?.metricValues?.[0]?.value;
+    viewsFromDayBeforeYesterday = response.rows[1]?.metricValues?.[0]?.value;
 
     if (viewsFromYesterday && viewsFromDayBeforeYesterday) {
       viewsFromYesterday = parseInt(viewsFromYesterday);

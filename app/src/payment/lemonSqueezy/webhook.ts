@@ -1,9 +1,10 @@
-// import { type MiddlewareConfigFn, HttpError } from 'wasp/server';
+import { type MiddlewareConfigFn } from 'wasp/server';
+// import { HttpError } from 'wasp/server';
 // import { type PaymentsWebhook } from 'wasp/server/api';
 import { type PrismaClient } from '@prisma/client';
 import express from 'express';
 import type { Request, Response } from 'express';
-import { type WebhookContext, type WebhookFunction, type MiddlewareConfigFunction } from '../types';
+import { type WebhookContext, type WebhookFunction } from '../types';
 
 // Mock HttpError for development
 class HttpError extends Error {
@@ -88,8 +89,8 @@ function parseRequestBody(request: express.Request): string {
   return requestBody;
 }
 
-export const lemonSqueezyMiddlewareConfigFn: MiddlewareConfigFunction = (
-  middlewareConfig: { delete: (name: string) => void; set: (name: string, handler: unknown) => void }
+export const lemonSqueezyMiddlewareConfigFn: MiddlewareConfigFn = (
+  middlewareConfig
 ) => {
   // We need to delete the default 'express.json' middleware and replace it with 'express.raw' middleware
   // because webhook data in the body of the request as raw JSON, not as JSON in the body of the request.

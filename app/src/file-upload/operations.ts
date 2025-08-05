@@ -24,7 +24,7 @@ export const createFile: CreateFile<
     s3UploadUrl: string;
     s3UploadFields: Record<string, string>;
   }
-> = async (rawArgs: CreateFileInput, context: any) => {
+> = async (rawArgs, context) => {
   if (!context.user) {
     throw new HttpError(401, 'Unauthorized');
   }
@@ -53,7 +53,7 @@ export const createFile: CreateFile<
   };
 };
 
-export const getAllFilesByUser: GetAllFilesByUser<void, File[]> = async (_args: void, context: any) => {
+export const getAllFilesByUser: GetAllFilesByUser<void, File[]> = async (_args, context) => {
   if (!context.user) {
     throw new HttpError(401, 'Unauthorized');
   }
@@ -76,7 +76,7 @@ type GetDownloadFileSignedURLInput = z.infer<typeof getDownloadFileSignedURLInpu
 export const getDownloadFileSignedURL: GetDownloadFileSignedURL<
   GetDownloadFileSignedURLInput,
   string
-> = async (rawArgs: GetDownloadFileSignedURLInput, _context: any) => {
+> = async (rawArgs, _context) => {
   const { key } = ensureArgsSchemaOrThrowHttpError(getDownloadFileSignedURLInputSchema, rawArgs);
   return await getDownloadFileSignedURLFromS3({ key });
 };

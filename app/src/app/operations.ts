@@ -116,8 +116,6 @@ export const createTask: CreateTask<CreateTaskInput, Task> = async (rawArgs, con
     throw new HttpError(401, 'Unauthorized');
   }
 
-  const { description } = ensureArgsSchemaOrThrowHttpError(createTaskInputSchema, rawArgs);
-
   const task = await context.entities.Task!.create({
     data: {
       description,
