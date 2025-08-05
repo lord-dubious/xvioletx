@@ -1,0 +1,472 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 16,
+        "title": "Project Setup and Core Wasp Boilerplate Integration",
+        "description": "Initialize the Wasp project and integrate core boilerplate features including User Authentication, Admin Management, File Management, Payment & Subscription, and Analytics & Reporting. This establishes the foundational application structure.",
+        "details": "Initialize a new Wasp project using `wasp new xtasker --template=full-stack`. Configure `main.wasp` to include `auth`, `file-upload`, `payments`, `admin`, and `analytics` features. For authentication, ensure email-based auth with verification and password reset are enabled. For file management, set up AWS S3 credentials in environment variables (e.g., `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET_NAME`, `AWS_REGION`). For payments, configure Stripe/Lemon Squeezy keys. For analytics, ensure job scheduling for stats collection is enabled. Run `wasp db migrate dev` to apply initial schema changes. Ensure `AuthPageLayout.tsx`, `LoginPage.tsx`, `SignupPage.tsx`, `FileUploadPage.tsx`, `PricingPage.tsx`, `AnalyticsDashboardPage.tsx`, and `UsersDashboardPage.tsx` are correctly integrated following Wasp's boilerplate structure.",
+        "testStrategy": "Verify successful project initialization. Test user registration, login, and password reset flows. Confirm file upload interface is present. Check if pricing and analytics pages load without errors. Validate admin dashboard accessibility for admin users.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Wasp Project and Enable Core Boilerplate Features",
+            "description": "Create a new Wasp project using the full-stack template and configure `main.wasp` to enable `auth`, `file-upload`, `payments`, `admin`, and `analytics` features.",
+            "dependencies": [],
+            "details": "Execute `wasp new xtasker --template=full-stack`. Modify `main.wasp` to explicitly include `auth`, `file-upload`, `payments`, `admin`, and `analytics` declarations to enable these core features.",
+            "status": "pending",
+            "testStrategy": "Verify `wasp start` runs without errors and the basic project structure is created. Confirm `main.wasp` correctly lists all specified features."
+          },
+          {
+            "id": 2,
+            "title": "Configure User Authentication and Integrate UI Pages",
+            "description": "Set up email-based authentication with verification and password reset functionalities, and integrate the associated frontend pages following Wasp's boilerplate.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Configure the `auth` feature in `main.wasp` to enable email-based authentication, including verification and password reset. Ensure `AuthPageLayout.tsx`, `LoginPage.tsx`, and `SignupPage.tsx` are correctly integrated into the application structure.",
+            "status": "pending",
+            "testStrategy": "Test user registration, login, and password reset flows. Verify the email verification process functions as expected."
+          },
+          {
+            "id": 3,
+            "title": "Set Up File Management with AWS S3 Integration",
+            "description": "Configure the Wasp project for file management by setting up AWS S3 credentials in environment variables and integrating the file upload UI.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Define AWS S3 credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET_NAME`, `AWS_REGION`) as environment variables accessible by the Wasp application. Ensure `FileUploadPage.tsx` is correctly integrated following Wasp's boilerplate structure.",
+            "status": "pending",
+            "testStrategy": "Confirm the file upload interface is present and accessible within the application."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Payment & Subscription Features and Pricing Page",
+            "description": "Configure payment gateway keys (Stripe/Lemon Squeezy) and integrate the pricing page into the application's UI.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Configure Stripe/Lemon Squeezy keys within the Wasp project's environment variables or `main.wasp` as required by the `payments` feature. Ensure `PricingPage.tsx` is correctly integrated following Wasp's boilerplate structure.",
+            "status": "pending",
+            "testStrategy": "Check if the pricing page loads without errors and displays expected content."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Admin & Analytics Dashboards and Apply Database Migrations",
+            "description": "Enable analytics job scheduling, integrate the admin and analytics dashboard UIs, and apply initial database schema changes for all configured features.",
+            "dependencies": [
+              "16.1",
+              "16.2",
+              "16.3",
+              "16.4"
+            ],
+            "details": "Ensure job scheduling for stats collection is enabled for the `analytics` feature. Integrate `AnalyticsDashboardPage.tsx` and `UsersDashboardPage.tsx` following Wasp's boilerplate structure. Finally, run `wasp db migrate dev` to apply all initial schema changes introduced by the enabled features.",
+            "status": "pending",
+            "testStrategy": "Validate admin dashboard accessibility for admin users. Check if the analytics dashboard loads without errors. Verify successful database migration by inspecting the database schema (e.g., via `wasp db studio`)."
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Implement Custom LLM Provider Integration",
+        "description": "Implement the backend and frontend components for configuring and interacting with custom LLM providers, supporting OpenAI, Google AI (Gemini), and generic custom API endpoints.",
+        "details": "Create `LlmSettings.tsx` for the UI to configure LLM providers, including input fields for base URLs, API keys, model names, temperature, max tokens, and top-p settings. Develop `ModelSelector.tsx` and `CustomEndpointForm.tsx` as sub-components. In `server/operations/operations.ts`, implement a `generateLlmResponse` action that dynamically routes requests to the appropriate LLM API based on user configuration. Use `@openai/openai` (v4.x) for OpenAI, `@google/generative-ai` (v0.11.x) for Google Gemini, and `axios` (v1.6.x) or `node-fetch` (v3.x) for custom API endpoints. Implement robust error handling, retry mechanisms (e.g., using `p-retry` or custom logic), and basic rate limiting. Store LLM configurations securely in the database, associated with the user.",
+        "testStrategy": "Configure different LLM providers (OpenAI, Google, Custom). Send test prompts and verify correct responses. Test invalid API keys and network errors to ensure proper error handling and retry logic. Validate that configuration settings (temperature, max tokens) are applied correctly.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Database Schema and Backend Configuration Management",
+            "description": "Define and implement the database schema for storing LLM provider configurations (type, base URL, API key, model, parameters) associated with users. Implement backend operations for CRUD (Create, Read, Update, Delete) of these configurations.",
+            "dependencies": [],
+            "details": "Create database models/entities for LLM configurations, ensuring secure storage of sensitive data like API keys. Implement Wasp actions/queries in `server/operations/operations.ts` to save, retrieve, update, and delete user-specific LLM settings. Ensure configurations are linked to the respective user.",
+            "status": "pending",
+            "testStrategy": "Verify database schema correctly stores all required fields (type, URL, key, model, params). Test creating, reading, updating, and deleting LLM configurations via backend operations. Ensure API keys are handled securely. Verify configurations are correctly associated with the user."
+          },
+          {
+            "id": 2,
+            "title": "Core Backend LLM API Integration",
+            "description": "Implement the `generateLlmResponse` action in `server/operations/operations.ts` to dynamically route and make API calls to OpenAI, Google AI (Gemini), and generic custom API endpoints based on stored user configurations.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "Utilize `@openai/openai` (v4.x) for OpenAI, `@google/generative-ai` (v0.11.x) for Google Gemini, and `axios` (v1.6.x) or `node-fetch` (v3.x) for custom endpoints. Implement logic to select the correct client/method based on the provider type retrieved from the database. Pass configured parameters (temperature, max tokens, top-p) to the respective APIs.",
+            "status": "pending",
+            "testStrategy": "Configure a valid OpenAI key and model; send a test prompt and verify a response. Configure a valid Google AI key and model; send a test prompt and verify a response. Configure a generic custom endpoint (e.g., a mock server); send a test prompt and verify a response. Verify that parameters like temperature, max tokens, top-p are correctly passed to the respective APIs."
+          },
+          {
+            "id": 3,
+            "title": "Backend Robustness: Error Handling, Retries, and Rate Limiting",
+            "description": "Enhance the backend LLM integration with robust error handling, automatic retry mechanisms for transient failures, and basic rate limiting to prevent abuse or exceeding API quotas.",
+            "dependencies": [
+              "17.2"
+            ],
+            "details": "Implement comprehensive try-catch blocks for all LLM API calls. Integrate `p-retry` or custom retry logic for specific error codes (e.g., 429, 5xx) indicating transient issues. Implement a simple in-memory or database-backed rate limiter per user or per API key to manage request volume. Ensure effective logging of errors and responses.",
+            "status": "pending",
+            "testStrategy": "Simulate network errors or invalid API keys for each provider type and verify proper error messages are returned. Test retry mechanism by introducing transient failures (e.g., mock a 500 error on first attempt) and ensure the request eventually succeeds. Test basic rate limiting: send multiple rapid requests and verify that subsequent requests are throttled or rejected appropriately."
+          },
+          {
+            "id": 4,
+            "title": "Frontend UI Components for LLM Settings",
+            "description": "Develop the core frontend UI components: `LlmSettings.tsx` as the main configuration page, and `ModelSelector.tsx` and `CustomEndpointForm.tsx` as sub-components for inputting LLM provider details.",
+            "dependencies": [],
+            "details": "Create `src/client/app/LlmSettings.tsx` to serve as the primary UI for managing LLM providers. Develop `ModelSelector.tsx` to allow users to choose between predefined models or custom ones. Implement `CustomEndpointForm.tsx` to capture base URLs, API keys, model names, temperature, max tokens, and top-p settings for generic API endpoints. Ensure input validation and a user-friendly layout.",
+            "status": "pending",
+            "testStrategy": "Verify `LlmSettings.tsx` renders correctly with all required input fields for different provider types. Test `ModelSelector.tsx` displays appropriate model options for selected provider types. Test `CustomEndpointForm.tsx` correctly captures base URL, API key, and other custom parameters. Ensure basic input validation (e.g., required fields) is present in the UI."
+          },
+          {
+            "id": 5,
+            "title": "Frontend-Backend Integration and User Experience",
+            "description": "Integrate the frontend UI components (`LlmSettings.tsx`, etc.) with the backend operations for saving, loading, and using LLM configurations. Implement the user flow for selecting and activating a custom LLM provider.",
+            "dependencies": [
+              "17.1",
+              "17.2",
+              "17.3",
+              "17.4"
+            ],
+            "details": "Connect `LlmSettings.tsx` to the backend CRUD operations for LLM configurations (from 17.1). Implement state management to allow users to select and activate their preferred LLM provider. Ensure that when a user selects a provider, subsequent calls to `generateLlmResponse` (from 17.2, with 17.3's robustness) use that specific configuration. Provide clear user feedback for saving, errors, and successful API calls.",
+            "status": "pending",
+            "testStrategy": "Use the UI to configure and save an OpenAI provider. Send a prompt and verify the response. Switch to a Google AI provider via the UI. Send a prompt and verify the response. Configure and save a custom endpoint via the UI. Send a prompt and verify the response. Test updating an existing configuration and verifying changes are applied. Test deleting a configuration. Verify error messages from backend (e.g., invalid API key) are displayed correctly in the UI."
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Develop AI-Powered Task Management Core Logic",
+        "description": "Develop the core AI logic for task processing, complexity analysis, time estimation, prioritization, categorization, and dependency detection, preparing for ElizaOS agent integration.",
+        "details": "Define data structures for tasks and scheduling in `src/shared/schedule.ts`. In `server/operations/operations.ts`, create actions/queries that will interact with ElizaOS agents (or mock their behavior initially). Implement pseudo-code for functions like `analyzeTaskComplexity(taskInput: string): { complexity: string, estimate: string }`, `suggestTimeEstimate(taskInput: string): number`, `categorizeTask(taskInput: string): string[]`, and `detectDependencies(taskInput: string, existingTasks: Task[]): number[]`. These functions will eventually call the configured LLM via `generateLlmResponse` (from Task 17) with specific prompts tailored for each AI task. For example, a prompt for complexity analysis could be: 'Analyze the complexity of the following task and suggest a time estimate: [task input]'.",
+        "testStrategy": "Provide various natural language task inputs and verify that the AI logic (even if mocked) returns plausible complexity, time estimates, categories, and dependency suggestions. Test edge cases like ambiguous or very simple/complex tasks.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Core Task & Schedule Data Structures",
+            "description": "Define the necessary TypeScript interfaces and types for tasks, including properties like title, description, status, priority, categories, time estimates, and dependencies, as well as scheduling information. These definitions will reside in `src/shared/schedule.ts`.",
+            "dependencies": [],
+            "details": "Create or update `src/shared/schedule.ts` to include `Task` interface, `TaskStatus` enum, `TaskPriority` enum, and any other types required for task and scheduling data. Ensure fields are present to support complexity, time estimation, categorization, and dependency detection outputs.",
+            "status": "pending",
+            "testStrategy": "Verify that all required data structures are correctly defined and exported from `src/shared/schedule.ts` and can be imported without errors in other modules."
+          },
+          {
+            "id": 2,
+            "title": "Implement Core AI Function Stubs and Mock Logic",
+            "description": "Create the function signatures and initial mock or pseudo-code implementations for the core AI logic functions: `analyzeTaskComplexity(taskInput: string): { complexity: string, estimate: string }`, `suggestTimeEstimate(taskInput: string): number`, `categorizeTask(taskInput: string): string[]`, and `detectDependencies(taskInput: string, existingTasks: Task[]): number[]`. These functions will be located in `server/operations/operations.ts` and will initially return hardcoded or simple logic-based responses.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "In `server/operations/operations.ts`, define the specified functions. For initial mocking, `analyzeTaskComplexity` could return fixed values like `{ complexity: 'medium', estimate: '2h' }`, `suggestTimeEstimate` could return `4`, `categorizeTask` could return `['general']`, and `detectDependencies` could return `[]`. These stubs will prepare for later LLM integration.",
+            "status": "pending",
+            "testStrategy": "Call each mock function with various inputs and assert that they return the expected mock outputs. Verify that the function signatures match the requirements."
+          },
+          {
+            "id": 3,
+            "title": "Develop LLM Prompts for Complexity & Time Estimation",
+            "description": "Refine the `analyzeTaskComplexity` and `suggestTimeEstimate` functions to construct specific prompts for the LLM (leveraging `generateLlmResponse` from Task 17). Implement the logic to send the task input to the LLM and parse its response to extract the complexity string and time estimate number.",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "Modify `analyzeTaskComplexity` and `suggestTimeEstimate` in `server/operations/operations.ts`. Construct prompts like 'Analyze the complexity of the following task and suggest a time estimate: [task input]' for complexity, and 'Suggest a time estimate in hours for the following task: [task input]' for time estimation. Integrate with `generateLlmResponse` (from Task 17) and implement robust parsing of the LLM's text response into the required `{ complexity: string, estimate: string }` and `number` formats.",
+            "status": "pending",
+            "testStrategy": "Provide various natural language task inputs to `analyzeTaskComplexity` and `suggestTimeEstimate`. Verify that the generated prompts are correct and that the functions correctly parse plausible complexity and time estimates from mock LLM responses (or actual LLM responses if Task 17 is complete)."
+          },
+          {
+            "id": 4,
+            "title": "Develop LLM Prompts for Categorization & Dependency Detection",
+            "description": "Refine the `categorizeTask` and `detectDependencies` functions to construct specific prompts for the LLM (leveraging `generateLlmResponse` from Task 17). Implement the logic to send task inputs and existing task lists to the LLM and parse its response to identify categories and detect dependencies.",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "Modify `categorizeTask` and `detectDependencies` in `server/operations/operations.ts`. For `categorizeTask`, prompts could be 'Categorize the following task into relevant categories: [task input]'. For `detectDependencies`, prompts could include the task input and a list of existing tasks, asking the LLM to identify dependencies. Integrate with `generateLlmResponse` and implement robust parsing of LLM responses into `string[]` for categories and `number[]` for dependency IDs.",
+            "status": "pending",
+            "testStrategy": "Provide various natural language task inputs to `categorizeTask` and `detectDependencies` (with sample `existingTasks`). Verify that the generated prompts are correct and that the functions correctly parse plausible categories and dependency IDs from mock LLM responses (or actual LLM responses)."
+          },
+          {
+            "id": 5,
+            "title": "Integrate & Test AI Core Logic",
+            "description": "Finalize the integration of the AI core logic functions with the ElizaOS agent framework (or refine robust mock implementations if ElizaOS integration is deferred). Conduct comprehensive testing of all AI functions (`analyzeTaskComplexity`, `suggestTimeEstimate`, `categorizeTask`, `detectDependencies`) using diverse natural language inputs, verifying plausible and accurate outputs, and handling edge cases like ambiguous or very simple/complex tasks.",
+            "dependencies": [
+              "18.3",
+              "18.4"
+            ],
+            "details": "Ensure the functions in `server/operations/operations.ts` are ready for ElizaOS agent interaction or provide production-ready mock implementations. Implement unit and integration tests for all AI functions. Test with a wide range of task inputs, including short, long, ambiguous, and clear tasks. Verify that the output formats are consistent and that the logic handles cases where the LLM might return unexpected formats gracefully.",
+            "status": "pending",
+            "testStrategy": "Provide various natural language task inputs and verify that the AI logic (even if mocked) returns plausible complexity, time estimates, categories, and dependency suggestions. Test edge cases like ambiguous or very simple/complex tasks. Ensure error handling for LLM failures or unexpected responses."
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Design Twitter Scheduling Database Schema",
+        "description": "Design and implement the `tweets` database table and related entities using Prisma, specifically for Twitter scheduling and AI tweet generation features.",
+        "details": "Modify `schema.prisma` to define the `Tweet` model. Include fields: `id` (String @id @default(cuid())), `content` (String), `mediaUrls` (String[]), `scheduledFor` (DateTime?), `status` (enum: `TweetStatus` - `draft`, `scheduled`, `posted`, `failed`), `retryCount` (Int @default(0)), `failureReason` (String?), `postedTweetId` (String?), `twitterAccountId` (String?), `agentId` (String?), `platform` (enum: `SocialPlatform` - `TWITTER`). Define the `TweetStatus` and `SocialPlatform` enums. Run `wasp db migrate dev --name add_tweets_table` to apply the schema changes and generate the Prisma client.",
+        "testStrategy": "Verify that the `tweets` table is created in the PostgreSQL database with all specified columns and enums. Use Prisma Studio (`wasp db studio`) to manually insert and query data to confirm schema integrity and data types.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define TweetStatus Enum in schema.prisma",
+            "description": "Create the `TweetStatus` enum in `schema.prisma` to represent the various lifecycle states a tweet can be in (draft, scheduled, posted, failed).",
+            "dependencies": [],
+            "details": "Add the following enum definition to `schema.prisma`: `enum TweetStatus { draft scheduled posted failed }`.",
+            "status": "pending",
+            "testStrategy": "N/A (definition, implicitly tested by later steps)"
+          },
+          {
+            "id": 2,
+            "title": "Define SocialPlatform Enum in schema.prisma",
+            "description": "Create the `SocialPlatform` enum in `schema.prisma` to specify the social media platform for which the tweet is intended.",
+            "dependencies": [],
+            "details": "Add the following enum definition to `schema.prisma`: `enum SocialPlatform { TWITTER }`.",
+            "status": "pending",
+            "testStrategy": "N/A (definition, implicitly tested by later steps)"
+          },
+          {
+            "id": 3,
+            "title": "Define Tweet Model in schema.prisma",
+            "description": "Define the `Tweet` model in `schema.prisma`, including all specified fields, their types, and default values, linking to the `TweetStatus` and `SocialPlatform` enums.",
+            "dependencies": [
+              "19.1",
+              "19.2"
+            ],
+            "details": "Add the `model Tweet { ... }` block to `schema.prisma` with the following fields: `id` (String @id @default(cuid())), `content` (String), `mediaUrls` (String[]), `scheduledFor` (DateTime?), `status` (TweetStatus), `retryCount` (Int @default(0)), `failureReason` (String?), `postedTweetId` (String?), `twitterAccountId` (String?), `agentId` (String?), `platform` (SocialPlatform).",
+            "status": "pending",
+            "testStrategy": "N/A (definition, implicitly tested by later steps)"
+          },
+          {
+            "id": 4,
+            "title": "Generate and Apply Database Migration",
+            "description": "Execute the Wasp CLI command to generate and apply the database migration, creating the `tweets` table and associated enums in the PostgreSQL database.",
+            "dependencies": [
+              "19.3"
+            ],
+            "details": "Run the command `wasp db migrate dev --name add_tweets_table` in the terminal to apply the schema changes and generate the Prisma client.",
+            "status": "pending",
+            "testStrategy": "Verify that the command executes successfully without errors and indicates a new migration has been applied."
+          },
+          {
+            "id": 5,
+            "title": "Verify Database Schema and Data Types",
+            "description": "Confirm that the `tweets` table has been correctly created in the PostgreSQL database with all specified columns, their correct data types, and that the enums are properly integrated.",
+            "dependencies": [
+              "19.4"
+            ],
+            "details": "Use Prisma Studio (`wasp db studio`) to inspect the `tweets` table. Manually insert and query sample data to confirm schema integrity, data types, and proper handling of `TweetStatus` and `SocialPlatform` enum values.",
+            "status": "pending",
+            "testStrategy": "Verify that the `tweets` table is created in the PostgreSQL database with all specified columns and enums. Use Prisma Studio (`wasp db studio`) to manually insert and query data to confirm schema integrity and data types."
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Implement Twitter Scheduling Backend Operations",
+        "description": "Develop backend operations for creating, updating, deleting, and retrieving tweets, including handling media uploads to Supabase and integrating with Google Gemini for media analysis.",
+        "details": "In `server/operations/operations.ts`, create Wasp actions: `createTweet`, `updateTweet`, `deleteTweet`. Implement a Wasp query `getTweets` to fetch tweets based on status or schedule. For media uploads, integrate with Supabase Storage (using `@supabase/supabase-js` v2.x). When a user uploads a file, generate a signed URL for direct browser upload to Supabase. After upload, store the Supabase file URL in `mediaUrls`. Integrate Google Gemini API (`@google/generative-ai` v0.11.x) within a backend operation (e.g., `analyzeMedia`) to process uploaded images/videos and generate alt-text or content ideas, using the `gemini-pro-vision` model for image analysis.",
+        "testStrategy": "Test creating, updating, and deleting tweets via API calls. Verify media files are successfully uploaded to Supabase and their URLs are stored in the database. Upload images and confirm that the `analyzeMedia` operation returns relevant alt-text or content suggestions from Google Gemini.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Core Tweet CRUD Operations",
+            "description": "Develop the fundamental backend operations for managing tweets.",
+            "dependencies": [],
+            "details": "In `server/operations/operations.ts`, implement Wasp actions: `createTweet`, `updateTweet`, `deleteTweet`. Also, implement a Wasp query `getTweets` to fetch tweets based on status or schedule criteria.",
+            "status": "pending",
+            "testStrategy": "Test creating, updating, and deleting tweets via API calls. Verify `getTweets` fetches correctly based on status or schedule."
+          },
+          {
+            "id": 2,
+            "title": "Implement Supabase Media Upload Signed URL Generation",
+            "description": "Develop the backend logic to facilitate secure direct media uploads to Supabase Storage.",
+            "dependencies": [],
+            "details": "Integrate with Supabase Storage using `@supabase/supabase-js` v2.x. Implement a backend operation (e.g., a Wasp action) that generates a signed URL, allowing the client to directly upload a file to Supabase Storage.",
+            "status": "pending",
+            "testStrategy": "Verify the backend operation successfully generates valid signed URLs for Supabase Storage that can be used for client-side uploads."
+          },
+          {
+            "id": 3,
+            "title": "Integrate Media URLs into Tweet Operations",
+            "description": "Modify tweet operations to store references to uploaded media files.",
+            "dependencies": [
+              "20.1",
+              "20.2"
+            ],
+            "details": "Enhance the `createTweet` and `updateTweet` Wasp actions to accept and store an array of Supabase file URLs (`mediaUrls`) associated with a tweet. Ensure these URLs are persisted in the database after a successful client-side upload using the signed URL.",
+            "status": "pending",
+            "testStrategy": "Verify that after media files are uploaded to Supabase (via client using signed URL), their URLs are correctly stored in the database as part of the tweet data when creating or updating a tweet."
+          },
+          {
+            "id": 4,
+            "title": "Implement Google Gemini Media Analysis Operation",
+            "description": "Develop a backend operation to analyze media content using Google Gemini.",
+            "dependencies": [],
+            "details": "Integrate Google Gemini API using `@google/genai` v1.5.x. Implement a new Wasp action, `analyzeMedia`, in `server/operations/operations.ts`. This action should take a Supabase media URL, process the image/video using the `gemini-pro-vision` model, and return generated alt-text or content ideas.",
+            "status": "pending",
+            "testStrategy": "Upload various images and videos and confirm that the `analyzeMedia` operation successfully processes them and returns relevant alt-text or content suggestions from Google Gemini."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Media Analysis Output with Tweet Data",
+            "description": "Connect the media analysis results with the stored tweet information.",
+            "dependencies": [
+              "20.1",
+              "20.3",
+              "20.4"
+            ],
+            "details": "Enhance existing tweet operations (e.g., `createTweet`, `updateTweet`) or create a new dedicated action to store the alt-text or content ideas generated by the `analyzeMedia` operation (from Subtask 4) alongside the tweet data in the database.",
+            "status": "pending",
+            "testStrategy": "Verify that alt-text or content ideas generated by `analyzeMedia` are correctly stored and associated with the respective tweet in the database, either automatically upon media upload or via a triggered action."
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "title": "Develop Twitter-like UI Components (Composer & Mobile Composer)",
+        "description": "Build the `TweetComposer.tsx` and `MobileTweetComposer.tsx` components, enabling users to compose tweets with character limits, media uploads, and AI helper integration.",
+        "details": "Develop `src/client/app/TweetComposer.tsx` and `src/client/app/MobileTweetComposer.tsx` using React, Tailwind CSS, and Shadcn/ui components (e.g., `Textarea`, `Button`, `Input`). Implement a live 280-character counter with visual warnings when exceeding the limit. Integrate a file input for image/video uploads, showing previews and progress/status. Connect the media upload functionality to the backend operations from Task 20. Add buttons for AI helpers (`generateTweet`, `improveTweet`) that trigger calls to the LLM integration (Task 17/18) with appropriate prompts, passing selected agent personality, bio, style guidelines, and examples.",
+        "testStrategy": "Verify character counter accuracy and warnings. Test image/video upload with previews and progress indicators. Ensure AI helper buttons trigger backend calls and populate the composer with generated content. Test responsiveness of `MobileTweetComposer`.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Core Composer UI and Character Counter",
+            "description": "Develop the foundational `TweetComposer.tsx` and `MobileTweetComposer.tsx` components using React, Tailwind CSS, and Shadcn/ui. Implement the primary `Textarea` for tweet input and a live 280-character counter with visual warnings for exceeding the limit.",
+            "dependencies": [],
+            "details": "Focus on the basic layout, input field, and the character counting logic with UI feedback. Utilize Shadcn/ui `Textarea` and `Input` components.",
+            "status": "done",
+            "testStrategy": "Verify character counter accuracy and visual warnings for various input lengths (under, at, over 280 characters)."
+          },
+          {
+            "id": 2,
+            "title": "Integrate Media Upload Functionality",
+            "description": "Add file input for image/video uploads within both `TweetComposer.tsx` and `MobileTweetComposer.tsx`. Implement logic to display media previews and show upload progress/status indicators. Connect this functionality to the backend operations defined in Task 20.",
+            "dependencies": [
+              "21.1"
+            ],
+            "details": "Utilize a file input element. Implement client-side logic for preview generation (e.g., using `URL.createObjectURL`). Integrate with backend API endpoints from Task 20 for actual file upload, showing progress and status updates.",
+            "status": "pending",
+            "testStrategy": "Test image/video upload with various file types and sizes. Verify previews are displayed correctly. Confirm progress/status indicators update accurately. Ensure successful connection to Task 20 backend operations."
+          },
+          {
+            "id": 3,
+            "title": "Implement AI Helper Button Integration",
+            "description": "Integrate buttons for AI helpers (`generateTweet`, `improveTweet`) into both composer components. Implement the frontend logic to trigger calls to the backend operations (which will then interact with LLM integration from Task 17/18 and Task 23). Ensure the ability to pass selected agent personality, bio, style guidelines, and examples, and to populate the composer with the generated content.",
+            "dependencies": [
+              "21.1"
+            ],
+            "details": "Add `Button` components for AI helpers. Implement client-side API calls to the backend (e.g., to `server/operations/operations.ts` for `generateTweet` and `improveTweet`). Handle the response to update the `Textarea` content.",
+            "status": "pending",
+            "testStrategy": "Verify AI helper buttons are clickable. Ensure they trigger backend calls with correct parameters (personality, bio, style, examples). Confirm generated content successfully populates the composer."
+          },
+          {
+            "id": 4,
+            "title": "Optimize Mobile Composer Responsiveness",
+            "description": "Conduct a thorough review and optimization of `MobileTweetComposer.tsx` to ensure full responsiveness and an optimal user experience across various mobile devices and screen sizes. This includes adapting the layout, input fields, media previews, and AI helper buttons for mobile.",
+            "dependencies": [
+              "21.1",
+              "21.2",
+              "21.3"
+            ],
+            "details": "Apply responsive design principles using Tailwind CSS breakpoints and utility classes. Test on different mobile viewports and device emulators to ensure proper rendering and functionality.",
+            "status": "pending",
+            "testStrategy": "Test `MobileTweetComposer` on various mobile device emulators/actual devices. Verify all UI elements and functionalities (character counter, media upload, AI helpers) are fully responsive and usable on mobile."
+          },
+          {
+            "id": 5,
+            "title": "Comprehensive Integration Testing and Refinement",
+            "description": "Perform end-to-end integration testing for both `TweetComposer.tsx` and `MobileTweetComposer.tsx`. This includes verifying the character counter, media uploads (previews, progress, backend connection), and AI helper integrations (triggering calls, populating content). Identify and address any remaining bugs, UI/UX issues, or performance bottlenecks.",
+            "dependencies": [
+              "21.1",
+              "21.2",
+              "21.3",
+              "21.4"
+            ],
+            "details": "Conduct a final round of testing covering all features and user flows. Address any visual glitches, performance issues, or functional bugs identified during testing. Ensure adherence to design specifications and a smooth user experience.",
+            "status": "pending",
+            "testStrategy": "Execute all test cases outlined in the parent task's test strategy. Conduct user acceptance testing (UAT) for overall flow and usability. Ensure cross-browser compatibility for desktop and mobile."
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "Implement Twitter Scheduling UI (Calendar & List Views)",
+        "description": "Implement the `SchedulingView`, `TweetCalendar`, and related UI components to visualize scheduled, posted, and failed tweets in calendar and list modes.",
+        "details": "Create `src/client/app/SchedulingView.tsx` as the main container, offering 'Calendar' and 'List' modes. Develop `src/client/app/TweetCalendar.tsx` to render scheduled tweets in a monthly grid. Use a library like `react-calendar` or build a custom grid. Clicking on a scheduled tweet should open a `TweetEditModal` for quick edits. Display stats summary cards (`StatsCard.tsx`) for Scheduled, Posted, Failed, and Total tweets, fetching data from backend analytics operations. Include a `CronJobStatus` indicator (e.g., a simple green/red dot) to reflect the health of the background posting job (will be fully functional after Task 23).",
+        "testStrategy": "Verify calendar view correctly displays scheduled tweets. Test switching between calendar and list modes. Ensure `TweetEditModal` opens on click. Validate stats cards display accurate counts. Check `CronJobStatus` indicator updates (even if manually toggled for now).",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement SchedulingView Container & Mode Switch",
+            "description": "Create `src/client/app/SchedulingView.tsx` as the main container component. Implement the UI for switching between 'Calendar' and 'List' display modes, setting up the foundational layout for the scheduling UI.",
+            "dependencies": [],
+            "details": "This subtask establishes the main shell for the Twitter scheduling UI. It will include the basic structure to house the calendar, list, stats, and status indicator components, along with the mechanism to toggle between the 'Calendar' and 'List' views.",
+            "status": "pending",
+            "testStrategy": "Verify `SchedulingView` renders correctly. Test that the 'Calendar' and 'List' mode toggles/buttons are present and functional, allowing switching between placeholder views."
+          },
+          {
+            "id": 2,
+            "title": "Develop TweetCalendar Component",
+            "description": "Develop `src/client/app/TweetCalendar.tsx` to render scheduled tweets in a monthly grid format. Integrate a calendar library (e.g., `react-calendar`) or build a custom grid to visualize tweet placements.",
+            "dependencies": [
+              "22.1"
+            ],
+            "details": "Focus on the visual representation of tweets on a calendar. This will involve fetching scheduled tweet data (initially mocked or from Task 20) and mapping it to calendar dates for display. The component should be integrated into the `SchedulingView`.",
+            "status": "pending",
+            "testStrategy": "Verify the calendar grid renders correctly. Test that dates with scheduled tweets are visually distinct. Ensure basic navigation (e.g., month switching) works as expected."
+          },
+          {
+            "id": 3,
+            "title": "Implement Tweet List View & Tweet Interaction",
+            "description": "Develop a component for the 'List' mode to display scheduled, posted, and failed tweets in a list format. Implement the functionality to open a `TweetEditModal` when a scheduled tweet is clicked in either the Calendar or List view.",
+            "dependencies": [
+              "22.1",
+              "22.2"
+            ],
+            "details": "This subtask covers the alternative display mode for tweets and the primary interaction point for editing. It will involve creating a list component and integrating the `TweetEditModal` for quick edits, ensuring it can receive tweet data upon click.",
+            "status": "pending",
+            "testStrategy": "Verify the list view correctly displays tweets. Test clicking on a tweet in both calendar and list views successfully opens the `TweetEditModal`. Ensure the modal receives the correct tweet data."
+          },
+          {
+            "id": 4,
+            "title": "Implement Stats Summary Cards & Analytics Integration",
+            "description": "Develop `StatsCard.tsx` components to display summary statistics for Scheduled, Posted, Failed, and Total tweets. Implement the logic to fetch this data from backend analytics operations.",
+            "dependencies": [
+              "22.1"
+            ],
+            "details": "This subtask focuses on fetching and displaying aggregate data. It will involve making API calls to retrieve the counts for different tweet statuses and rendering them in dedicated card components within the `SchedulingView`.",
+            "status": "pending",
+            "testStrategy": "Verify `StatsCard` components render correctly. Test that the displayed counts accurately reflect data fetched from the backend (mocked or real). Ensure proper handling of loading and error states for data fetching."
+          },
+          {
+            "id": 5,
+            "title": "Implement Cron Job Status Indicator",
+            "description": "Develop a `CronJobStatus` indicator component (e.g., a simple green/red dot) to reflect the health of the background posting job. Integrate this indicator into the `SchedulingView` UI.",
+            "dependencies": [
+              "22.1"
+            ],
+            "details": "This is a small, dedicated UI element to provide quick feedback on the background job's status. For now, its status can be manually toggled or hardcoded, as full functionality depends on Task 23.",
+            "status": "pending",
+            "testStrategy": "Verify the `CronJobStatus` indicator is visible within the UI. Test that its visual state (e.g., color) can be changed (e.g., via props or internal state) to represent different statuses (e.g., healthy/unhealthy)."
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "title": "Develop AI Tweet Generation and Scheduling Logic",
+        "description": "Implement the AI tweet generation logic, including prompt building, and the scheduling mechanism for tweets using Wasp's job scheduling.",
+        "details": "In `server/operations/operations.ts`, refine `generateTweet` and `improveTweet` actions. These actions will construct detailed prompts for the LLM (using the LLM integration from Task 17), incorporating user-selected agent personality, bio, style guidelines, and examples. The LLM response will then be used to create or update a tweet in the da

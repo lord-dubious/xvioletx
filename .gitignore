@@ -20,8 +20,8 @@ node_modules/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
-.taskmaster
+
+
 # OS specific
 .DS_Store
 
