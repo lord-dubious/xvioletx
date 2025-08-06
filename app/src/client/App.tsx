@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { routes } from 'wasp/client/router';
 import './Main.css';
 import NavBar from './components/NavBar/NavBar';
-import { appNavigationItems, marketingNavigationItems } from './components/NavBar/constants';
+import { demoNavigationitems, marketingNavigationItems } from './components/NavBar/constants';
 import CookieConsentBanner from './components/cookie-consent/Banner';
 
 /**
@@ -16,7 +16,7 @@ export default function App() {
     return location.pathname === '/' || location.pathname.startsWith('/pricing');
   }, [location]);
 
-  const navigationItems = isMarketingPage ? marketingNavigationItems : appNavigationItems;
+  const navigationItems = isMarketingPage ? marketingNavigationItems : demoNavigationitems;
 
   const shouldDisplayAppNavBar = useMemo(() => {
     return (

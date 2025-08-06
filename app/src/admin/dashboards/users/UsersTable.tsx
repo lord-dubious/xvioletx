@@ -21,7 +21,7 @@ function AdminSwitch({ id, isAdmin }: Pick<User, 'id' | 'isAdmin'>) {
   return (
     <Switch
       checked={isAdmin}
-      onCheckedChange={(value: boolean) => updateIsUserAdminById({ id: id, isAdmin: value })}
+      onCheckedChange={(value) => updateIsUserAdminById({ id: id, isAdmin: value })}
       disabled={isCurrentUser}
     />
   );
@@ -163,7 +163,7 @@ const UsersTable = () => {
                   isAdmin:
                 </Label>
                 <Select
-                  onValueChange={(value: string) => {
+                  onValueChange={(value) => {
                     if (value === 'both') {
                       setIsAdminFilter(undefined);
                     } else {

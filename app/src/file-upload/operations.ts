@@ -26,7 +26,7 @@ export const createFile: CreateFile<
   }
 > = async (rawArgs, context) => {
   if (!context.user) {
-    throw new HttpError(401, 'Unauthorized');
+    throw new HttpError(401);
   }
 
   const { fileType, fileName } = ensureArgsSchemaOrThrowHttpError(createFileInputSchema, rawArgs);
@@ -55,7 +55,7 @@ export const createFile: CreateFile<
 
 export const getAllFilesByUser: GetAllFilesByUser<void, File[]> = async (_args, context) => {
   if (!context.user) {
-    throw new HttpError(401, 'Unauthorized');
+    throw new HttpError(401);
   }
   return context.entities.File.findMany({
     where: {

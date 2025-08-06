@@ -23,8 +23,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const location = useLocation();
   const { pathname } = location;
 
-  const trigger = useRef<HTMLButtonElement>(null);
-  const sidebar = useRef<HTMLElement>(null);
+  const trigger = useRef<any>(null);
+  const sidebar = useRef<any>(null);
 
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded');
   const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -35,7 +35,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || !trigger.current) return;
-      if (!sidebarOpen || sidebar.current.contains(target as Node) || trigger.current.contains(target as Node)) return;
+      if (!sidebarOpen || sidebar.current.contains(target) || trigger.current.contains(target)) return;
       setSidebarOpen(false);
     };
     document.addEventListener('click', clickHandler);
