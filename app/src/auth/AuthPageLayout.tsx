@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 export function AuthPageLayout({children} : {children: ReactNode }) {
   return (

@@ -36,7 +36,7 @@ function generateMockUserData(): MockUserData {
     createdAt,
     isAdmin: false,
     credits,
-    subscriptionStatus: subscriptionStatus || null,
+    subscriptionStatus,
     lemonSqueezyCustomerPortalUrl: null,
     paymentProcessorUserId: hasUserPaidOnStripe ? `cus_test_${faker.string.uuid()}` : null,
     datePaid: hasUserPaidOnStripe ? faker.date.between({ from: createdAt, to: timePaid }) : null,

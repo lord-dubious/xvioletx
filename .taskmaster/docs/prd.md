@@ -1,22 +1,22 @@
 # XTasker - Features and Application Structure
 
 ## Application Overview
-XTasker is a task management SaaS application built with Wasp framework, integrating ElizaOS agent framework for AI-powered task assistance and automation. The application follows Wasp.sh conventions and boilerplate structure while providing a Twitter-like interface design similar to the main task3 repository.
+XTasker is a social media scheduling and content creation SaaS application built with the Wasp framework. It integrates the ElizaOS agent framework for AI-powered assistance and automation, which includes its own persona system and API, all presented in a Twitter-like interface.
 
 ## Core Features Implementation
 
-### 1. AI-Powered Task Management
+### 1. AI-Powered Social Media Scheduling
 **How it works:**
 - Uses custom LLM providers with configurable base URLs, models, and parameters
-- ElizaOS agents process natural language input and convert to actionable tasks
-- AI analyzes task complexity and suggests time estimates and priorities
-- Automatic task categorization and dependency detection
+- ElizaOS agents process natural language input and convert to actionable social media posts
+- AI analyzes post complexity and suggests time estimates and priorities
+- Automatic post categorization and dependency detection
 - Support for multiple LLM providers (OpenAI, Anthropic, local models, etc.)
 
 **Components:**
-- `AppPage.tsx` - Main task interface with AI scheduler (renamed from DemoAppPage)
+- `AppPage.tsx` - Main social media scheduling interface with AI scheduler
 - `operations.ts` - Backend operations for LLM integration
-- `schedule.ts` - Task scheduling logic and data structures
+- `schedule.ts` - Post scheduling logic and data structures
 - `LlmSettings.tsx` - Custom LLM configuration interface
 
 ### 2. User Authentication System (Wasp Boilerplate)
@@ -180,7 +180,7 @@ server/
 
 ### LLM Provider Support
 **Supported Providers:**
-- OpenAI (with cutatom model and base url)
+- OpenAI (with custom model and base url)
 - Custom API endpoints
 - Google AI (Gemini)
 
@@ -199,12 +199,12 @@ server/
 
 ## Component Integration Flow (Wasp-Compliant)
 
-### 1. Task Creation Flow
-1. User inputs task via `TweetComposer.tsx` interface
+### 1. Social Media Post Creation Flow
+1. User inputs post via `TweetComposer.tsx` interface
 2. ElizaOS agent processes natural language input (on hold)
 3. `generateLlmResponse` operation calls configured LLM provider
-4. Structured task data returned and stored
-5. UI updates with new task and AI suggestions
+4. Structured post data returned and stored
+5. UI updates with new post and AI suggestions
 
 ### 2. File Upload Flow (Wasp Boilerplate)
 1. User selects file in `FileUploadPage.tsx`
@@ -228,15 +228,15 @@ server/
 
 ## ElizaOS Agent Integration Points
 
-### 1. Task Processing
-- Natural language task input parsing
-- Task complexity analysis and estimation
-- Automatic categorization and tagging
+### 1. Post Processing
+- Natural language post input parsing
+- Post complexity analysis and estimation
+- Automatic post categorization and tagging
 - Dependency detection and suggestion
 
 ### 2. Schedule Optimization
 - AI-powered daily schedule generation
-- Priority-based task ordering
+- Priority-based post ordering
 - Time block optimization
 - Conflict resolution and suggestions
 

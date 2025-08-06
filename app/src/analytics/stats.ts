@@ -1,6 +1,6 @@
 import { type DailyStats } from 'wasp/entities';
 import { type DailyStatsJob } from 'wasp/server/jobs';
-import type Stripe from 'stripe';
+import Stripe from 'stripe';
 import { stripe } from '../payment/stripe/stripeClient';
 import { listOrders } from '@lemonsqueezy/lemonsqueezy.js';
 import { getDailyPageViews, getSources } from './providers/plausibleAnalyticsUtils';
@@ -10,7 +10,7 @@ import { SubscriptionStatus } from '../payment/plans';
 
 export type DailyStatsProps = { dailyStats?: DailyStats; weeklyStats?: DailyStats[]; isLoading?: boolean };
 
-export const calculateDailyStats: DailyStatsJob<never, void> = async (_args: never, context) => {
+export const calculateDailyStats: DailyStatsJob<never, void> = async (_args, context) => {
   const nowUTC = new Date(Date.now());
   nowUTC.setUTCHours(0, 0, 0, 0);
 
@@ -120,11 +120,11 @@ export const calculateDailyStats: DailyStatsJob<never, void> = async (_args: nev
     }
 
     console.table({ dailyStats });
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error('Error calculating daily stats: ', error);
     await context.entities.Logs.create({
       data: {
-        message: `Error calculating daily stats: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Error calculating daily stats: ${error?.message}`,
         level: 'job-error',
       },
     });
@@ -133,7 +133,7 @@ export const calculateDailyStats: DailyStatsJob<never, void> = async (_args: nev
 
 async function fetchTotalStripeRevenue() {
   let totalRevenue = 0;
-  const params: Stripe.BalanceTransactionListParams = {
+  let params: Stripe.BalanceTransactionListParams = {
     limit: 100,
     // created: {
     //   gte: startTimestamp,

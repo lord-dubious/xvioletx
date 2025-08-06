@@ -1,18 +1,7 @@
-import { type MiddlewareConfigFn } from 'wasp/server';
-// import { HttpError } from 'wasp/server';
-// import { type PaymentsWebhook } from 'wasp/server/api';
+import { type MiddlewareConfigFn, HttpError } from 'wasp/server';
+import { type PaymentsWebhook } from 'wasp/server/api';
 import { type PrismaClient } from '@prisma/client';
 import express from 'express';
-import type { Request, Response } from 'express';
-import { type WebhookContext, type WebhookFunction } from '../types';
-
-// Mock HttpError for development
-class HttpError extends Error {
-  constructor(public statusCode: number, message: string) {
-    super(message);
-    this.name = 'HttpError';
-  }
-}
 import { paymentPlans, PaymentPlanId, SubscriptionStatus } from '../plans';
 import { updateUserLemonSqueezyPaymentDetails } from './paymentDetails';
 import { getCustomer } from '@lemonsqueezy/lemonsqueezy.js';
@@ -22,11 +11,7 @@ import { parseWebhookPayload, type OrderData, type SubscriptionData } from './we
 import { assertUnreachable } from '../../shared/utils';
 import { UnhandledWebhookEventError } from '../errors';
 
-export const lemonSqueezyWebhook: WebhookFunction = async (
-  request: Request,
-  response: Response,
-  context: WebhookContext
-) => {
+export const lemonSqueezyWebhook: PaymentsWebhook = async (request, response, context) => {
   try {
     const rawRequestBody = parseRequestBody(request);
 
@@ -56,7 +41,7 @@ export const lemonSqueezyWebhook: WebhookFunction = async (
     }
 
     return response.status(200).json({ received: true });
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof UnhandledWebhookEventError) {
       console.error(err.message);
       return response.status(422).json({ error: err.message });
@@ -89,9 +74,7 @@ function parseRequestBody(request: express.Request): string {
   return requestBody;
 }
 
-export const lemonSqueezyMiddlewareConfigFn: MiddlewareConfigFn = (
-  middlewareConfig
-) => {
+export const lemonSqueezyMiddlewareConfigFn: MiddlewareConfigFn = (middlewareConfig) => {
   // We need to delete the default 'express.json' middleware and replace it with 'express.raw' middleware
   // because webhook data in the body of the request as raw JSON, not as JSON in the body of the request.
   middlewareConfig.delete('express.json');

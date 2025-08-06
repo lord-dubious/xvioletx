@@ -29,7 +29,7 @@ const task2 = 'build SaaS app draft';
 test('User can make 3 AI schedule generations', async () => {
   test.slow(); // Use a longer timeout time in case OpenAI is slow to respond
 
-  expect(page.url()).toContain('/app');
+  expect(page.url()).toContain('/demo-app');
   await page.fill('input[id="description"]', task1);
   await page.click('button:has-text("Add task")');
   await expect(page.getByText(task1)).toBeVisible();
@@ -95,7 +95,7 @@ test('Make test payment with Stripe for hobby plan', async () => {
 });
 
 test('User should be able to generate another schedule after payment', async () => {
-  await page.goto('/app');
+  await page.goto('/demo-app');
 
   const generateScheduleButton = page.getByRole('button', { name: 'Generate Schedule' });
   await expect(generateScheduleButton).toBeVisible();

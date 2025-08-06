@@ -1,8 +1,5 @@
 import { z } from 'zod';
-// import { defineUserSignupFields } from 'wasp/auth/providers/types';
-
-// Mock defineUserSignupFields for development
-const defineUserSignupFields = (fields: Record<string, (data: unknown) => unknown>) => fields;
+import { defineUserSignupFields } from 'wasp/auth/providers/types';
 
 const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
 
@@ -11,15 +8,15 @@ const emailDataSchema = z.object({
 });
 
 export const getEmailUserFields = defineUserSignupFields({
-  email: (data: unknown) => {
+  email: (data) => {
     const emailData = emailDataSchema.parse(data);
     return emailData.email;
   },
-  username: (data: unknown) => {
+  username: (data) => {
     const emailData = emailDataSchema.parse(data);
     return emailData.email;
   },
-  isAdmin: (data: unknown) => {
+  isAdmin: (data) => {
     const emailData = emailDataSchema.parse(data);
     return adminEmails.includes(emailData.email);
   },
@@ -40,15 +37,15 @@ const githubDataSchema = z.object({
 });
 
 export const getGitHubUserFields = defineUserSignupFields({
-  email: (data: unknown) => {
+  email: (data) => {
     const githubData = githubDataSchema.parse(data);
     return getGithubEmailInfo(githubData).email;
   },
-  username: (data: unknown) => {
+  username: (data) => {
     const githubData = githubDataSchema.parse(data);
     return githubData.profile.login;
   },
-  isAdmin: (data: unknown) => {
+  isAdmin: (data) => {
     const githubData = githubDataSchema.parse(data);
     const emailInfo = getGithubEmailInfo(githubData);
     if (!emailInfo.verified) {
@@ -80,15 +77,15 @@ const googleDataSchema = z.object({
 });
 
 export const getGoogleUserFields = defineUserSignupFields({
-  email: (data: unknown) => {
+  email: (data) => {
     const googleData = googleDataSchema.parse(data);
     return googleData.profile.email;
   },
-  username: (data: unknown) => {
+  username: (data) => {
     const googleData = googleDataSchema.parse(data);
     return googleData.profile.email;
   },
-  isAdmin: (data: unknown) => {
+  isAdmin: (data) => {
     const googleData = googleDataSchema.parse(data);
     if (!googleData.profile.email_verified) {
       return false;
@@ -112,7 +109,7 @@ const discordDataSchema = z.object({
 });
 
 export const getDiscordUserFields = defineUserSignupFields({
-  email: (data: unknown) => {
+  email: (data) => {
     const discordData = discordDataSchema.parse(data);
     // Users need to have an email for payment processing.
     if (!discordData.profile.email) {
@@ -120,11 +117,11 @@ export const getDiscordUserFields = defineUserSignupFields({
     }
     return discordData.profile.email;
   },
-  username: (data: unknown) => {
+  username: (data) => {
     const discordData = discordDataSchema.parse(data);
     return discordData.profile.username;
   },
-  isAdmin: (data: unknown) => {
+  isAdmin: (data) => {
     const discordData = discordDataSchema.parse(data);
     if (!discordData.profile.email || !discordData.profile.verified) {
       return false;

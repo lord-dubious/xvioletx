@@ -1,18 +1,7 @@
-// import { type MiddlewareConfigFn, HttpError } from 'wasp/server';
-// import { type PaymentsWebhook } from 'wasp/server/api';
+import { type MiddlewareConfigFn, HttpError } from 'wasp/server';
+import { type PaymentsWebhook } from 'wasp/server/api';
 import { type PrismaClient } from '@prisma/client';
 import express from 'express';
-import type { Request, Response } from 'express';
-import { type WebhookContext, type WebhookFunction } from '../types';
-import { type MiddlewareConfigFn } from 'wasp/server';
-
-// Mock HttpError for development
-class HttpError extends Error {
-  constructor(public statusCode: number, message: string) {
-    super(message);
-    this.name = 'HttpError';
-  }
-}
 import type { Stripe } from 'stripe';
 import { stripe } from './stripeClient';
 import { paymentPlans, PaymentPlanId, SubscriptionStatus, type PaymentPlanEffect } from '../plans';
@@ -29,11 +18,7 @@ import {
 } from './webhookPayload';
 import { UnhandledWebhookEventError } from '../errors';
 
-export const stripeWebhook: WebhookFunction = async (
-  request: Request,
-  response: Response,
-  context: WebhookContext
-) => {
+export const stripeWebhook: PaymentsWebhook = async (request, response, context) => {
   try {
     const rawStripeEvent = constructStripeEvent(request);
     const { eventName, data } = await parseWebhookPayload(rawStripeEvent);
@@ -59,7 +44,7 @@ export const stripeWebhook: WebhookFunction = async (
         assertUnreachable(eventName);
     }
     return response.json({ received: true }); // Stripe expects a 200 response to acknowledge receipt of the webhook
-  } catch (err: unknown) {
+  } catch (err) {
     if (err instanceof UnhandledWebhookEventError) {
       console.error(err.message);
       return response.status(422).json({ error: err.message });
@@ -82,14 +67,12 @@ function constructStripeEvent(request: express.Request): Stripe.Event {
       throw new HttpError(400, 'Stripe webhook signature not provided');
     }
     return stripe.webhooks.constructEvent(request.body, sig, secret);
-  } catch {
+  } catch (err) {
     throw new HttpError(500, 'Error constructing Stripe webhook event');
   }
 }
 
-export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
-  middlewareConfig
-) => {
+export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (middlewareConfig) => {
   // We need to delete the default 'express.json' middleware and replace it with 'express.raw' middleware
   // because webhook data in the body of the request as raw JSON, not as JSON in the body of the request.
   middlewareConfig.delete('express.json');
