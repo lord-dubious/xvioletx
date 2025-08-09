@@ -1,309 +1,334 @@
-# XTasker - Features and Application Structure
+# xtasker - Product Requirements Document
 
-## Application Overview
-XTasker is a social media scheduling and content creation SaaS application built with the Wasp framework. It integrates the ElizaOS agent framework for AI-powered assistance and automation, which includes its own persona system and API, all presented in a Twitter-like interface.
+## 🎯 Product Overview
 
-## Core Features Implementation
+**Product Name**: xtasker
+**Product Type**: AI-powered Twitter management platform
+**Target Users**: Content creators, social media managers, businesses, influencers
+**Core Value Proposition**: Streamline Twitter content creation, scheduling, and management with AI assistance
 
-### 1. AI-Powered Social Media Scheduling
-**How it works:**
-- Uses custom LLM providers with configurable base URLs, models, and parameters
-- ElizaOS agents process natural language input and convert to actionable social media posts
-- AI analyzes post complexity and suggests time estimates and priorities
-- Automatic post categorization and dependency detection
-- Support for multiple LLM providers (OpenAI, Anthropic, local models, etc.)
+## 📋 Executive Summary
 
-**Components:**
-- `AppPage.tsx` - Main social media scheduling interface with AI scheduler
-- `operations.ts` - Backend operations for LLM integration
-- `schedule.ts` - Post scheduling logic and data structures
-- `LlmSettings.tsx` - Custom LLM configuration interface
+xtasker is an intelligent Twitter management platform that combines AI-powered content generation with smart scheduling and media optimization. Users can create engaging tweets using AI agents with custom personalities, schedule content for optimal engagement times, and manage their Twitter presence efficiently.
 
-### 2. User Authentication System (Wasp Boilerplate)
-**How it works:**
-- Email-based authentication with verification (Wasp built-in)
-- Password reset functionality via email
-- JWT token management through Wasp auth system
-- Role-based access control (user/admin)
-- Maintains Wasp.sh auth conventions and structure
+The platform integrates with Google AI (Gemini) for content generation, Cloudflare R2 for media storage, and Twitter API v2 for seamless posting and account management.
 
-**Components:**
-- `AuthPageLayout.tsx` - Authentication wrapper component
-- `LoginPage.tsx` - User login interface
-- `SignupPage.tsx` - User registration interface
-- `userSignupFields.ts` - User registration field configuration
-- Email templates in `auth/email-and-pass/emails.ts`
+## 🎯 Core Features
 
-### 3. File Management System (Wasp Boilerplate)
-**How it works:**
-- AWS S3 integration for secure file storage
-- Pre-signed URLs for direct browser uploads
-- File validation and type checking
-- User-specific file organization
-- Follows Wasp file upload patterns
+### 1. AI-Powered Content Generation
+**Priority**: High
+**Description**: Generate engaging tweets using OpenAI (leveraging existing OpenAI integration)
 
-**Components:**
-- `FileUploadPage.tsx` - File upload interface with progress tracking
-- `fileUploading.ts` - Upload logic and validation
-- `s3Utils.ts` - AWS S3 integration utilities
-- `operations.ts` - Backend file operations
+**User Stories**:
+- As a subscriber, I want unlimited AI tweet generation using the platform's OpenAI key
+- As a free user, I want to use my own OpenAI API key for unlimited AI generation
+- As a power user, I want to configure custom OpenAI endpoints (Azure OpenAI, local models)
+- As a business owner, I want AI to analyze my uploaded images and create contextual tweets
+- As a social media manager, I want to improve existing tweets with AI suggestions for better engagement
 
-### 4. Payment and Subscription Management (Wasp Boilerplate)
-**How it works:**
-- Multiple payment processors (Stripe, Lemon Squeezy)
-- Subscription plans with different feature tiers
-- Credit-based usage tracking
-- Customer portal for self-service management
-- Maintains Wasp payment structure
+**Acceptance Criteria**:
+- Subscribers get unlimited AI usage with platform's OpenAI key
+- Free users can configure their own OpenAI API key in settings
+- Support for custom OpenAI base URLs and model selection
+- Users can input prompts and receive AI-generated tweet suggestions
+- System analyzes uploaded images and generates relevant tweet content (extends existing file-upload)
+- AI provides suggestions to improve existing tweet drafts
+- Generated content respects Twitter's character limits
+- Users can regenerate content with different tones/styles
 
-**Components:**
-- `PricingPage.tsx` - Subscription plans display
-- `CheckoutPage.tsx` - Payment processing interface
-- `plans.ts` - Payment plan configurations
-- `paymentProcessor.ts` - Payment logic abstraction
-- Webhook handlers for payment events
+### 2. Custom AI Agents
+**Priority**: High
+**Description**: Create personalized AI personas for consistent brand voice
 
-### 5. Analytics and Reporting (Wasp Boilerplate)
-**How it works:**
-- Daily statistics collection and aggregation
-- Page view tracking and source attribution
-- Revenue and user growth metrics
-- Real-time dashboard updates
-- Uses Wasp job scheduling for stats
+**User Stories**:
+- As a brand manager, I want to create AI agents with specific personalities so my content maintains consistent voice
+- As an influencer, I want different AI agents for different content types (professional, casual, educational)
+- As a business, I want AI agents that understand my industry expertise and terminology
 
-**Components:**
-- `AnalyticsDashboardPage.tsx` - Main analytics interface
-- `TotalPageViewsCard.tsx` - Page view metrics display
-- `TotalRevenueCard.tsx` - Revenue tracking
-- `RevenueAndProfitChart.tsx` - Visual analytics
-- `stats.ts` - Analytics data processing
+**Acceptance Criteria**:
+- Users can create multiple AI agents with custom names and personalities
+- Each agent has defined expertise areas and writing styles
+- Agents can be trained with example posts for consistency
+- Users can select specific agents when generating content
+- Agents maintain personality across all generated content
 
-### 6. Admin Management System (Wasp Boilerplate)
-**How it works:**
-- Role-based admin access control
-- User management and monitoring
-- System health and performance monitoring
-- Content and configuration management
-- Follows Wasp admin patterns
+### 3. Smart Tweet Scheduling
+**Priority**: High
+**Description**: Schedule tweets for optimal posting times with intelligent recommendations
 
-**Components:**
-- `DefaultLayout.tsx` - Admin dashboard layout
-- `UsersDashboardPage.tsx` - User management interface
-- `SettingsPage.tsx` - System configuration
-- `useRedirectHomeUnlessUserIsAdmin.ts` - Admin access control
+**User Stories**:
+- As a content creator, I want to schedule tweets for when my audience is most active
+- As a global business, I want to schedule content for different time zones
+- As a busy professional, I want to batch create and schedule a week's worth of content
 
-### 7. Twitter Scheduling & AI Tweet Generation
+**Acceptance Criteria**:
+- Users can schedule tweets for specific dates and times
+- System suggests optimal posting times based on audience analytics
+- Bulk scheduling interface for multiple tweets
+- Calendar view showing scheduled content
+- Automatic posting at scheduled times
+- Edit/delete scheduled tweets before posting
 
-**How it works:**
-- Users compose tweets via `TweetComposer` and `MobileTweetComposer` with a live 280-character counter and warnings when over the limit.
-- Optional image/video upload with previews. Files are stored in Supabase; progress and status are shown to the user.
-- Google Gemini media analysis (`analyzeMedia`) can generate alt-text or content ideas.
-- AI helpers (`generateTweet`, `improveTweet`) build prompts using selected agent personality, bio, style guidelines, and examples.
-- Tweets may be saved as drafts, posted immediately, or scheduled for a future date/time using `InlineSchedulePicker`.
-- Supabase-backed `tweets` table tracks statuses: `draft`, `scheduled`, `posted`, `failed`, plus retry counts, failure reasons, and posted tweet IDs.
+### 4. Media Management & Optimization
+**Priority**: Medium
+**Description**: Leverage existing file-upload system for Twitter media optimization
 
-**Scheduler & Calendar:**
-- `SchedulingView` offers Calendar and List modes to visualise scheduled, posted, and failed tweets.
-- `TweetCalendar` renders scheduled tweets in a monthly grid; clicking opens `TweetEditModal` for quick edits.
-- Stats summary cards show counts for Scheduled, Posted, Failed, and Total tweets.
-- `CronJobStatus` indicator reflects background posting job health.
+**User Stories**:
+- As a visual content creator, I want to upload and optimize images for Twitter
+- As a video creator, I want automatic video compression for faster uploads
+- As a mobile user, I want images automatically resized for optimal Twitter display
 
-**Extensibility Notes:**
-- Hooks (`useTweets`) and DB schema include fields like `twitter_account_id` and `agent_id`, and can be extended with a `platform` enum for multi-network support.
-- UI components are built to accept a `platform` prop so they can be reused for future social channels.
+**Acceptance Criteria**:
+- Extends existing S3-compatible file-upload system (works with Cloudflare R2!)
+- Support for image uploads (JPEG, PNG, GIF, WebP) - already implemented
+- Support for video uploads (MP4, MOV, AVI) - extends existing validation
+- Automatic image compression and optimization (40-70% size reduction)
+- Automatic resizing to Twitter's optimal dimensions
+- Format conversion to web-optimized formats
+- Media library for reusing uploaded content (extends existing File entity)
+- Leverages existing presigned URL system for secure uploads
 
-### 8. Placeholder: Other Social Platforms
+### 5. Twitter Account Integration
+**Priority**: High
+**Description**: Secure connection to Twitter accounts for posting and analytics
 
-Space reserved for future integrations (e.g., LinkedIn, Instagram, Mastodon). Design assumptions:
-- Introduce a generic `Post` entity with a `platform` enum and shared fields (content, media, scheduled_for, status, retry_count, etc.).
-- Modular API adapters per platform handle OAuth, posting, and analytics.
-- Composer and scheduler components render platform-specific character/media limits and branding dynamically via props.
-- Calendar and stats cards should group and filter by platform.
+**User Stories**:
+- As a user, I want to securely connect my Twitter account to post content
+- As a social media manager, I want to manage multiple Twitter accounts
+- As a business owner, I want to ensure my Twitter credentials are secure
 
-## UI Design Structure (Similar to Task3 Main Repo)
+**Acceptance Criteria**:
+- OAuth 2.0 integration with Twitter API v2
+- Secure storage of access and refresh tokens
+- Support for multiple connected Twitter accounts
+- Automatic token refresh handling
+- Account verification and status display
+- Disconnect/reconnect account functionality
 
-### Twitter-like Interface Components
-**Main Layout:**
-- `Header.tsx` - Top navigation with user profile and notifications
-- `Sidebar.tsx` - Left navigation panel with main menu items
-- `MobileSidebar.tsx` - Mobile-responsive navigation
-- `MobileBottomNav.tsx` - Bottom navigation for mobile
+### 6. Content Calendar & Analytics
+**Priority**: Medium
+**Description**: Visual calendar interface and performance tracking
 
-**Task Management Interface:**
-- `TweetComposer.tsx` - Task creation interface (Twitter-like composer)
-- `AgentList.tsx` - List of available AI agents (on hold for now)
+**User Stories**:
+- As a content planner, I want a calendar view of my scheduled content
+- As a marketer, I want to track tweet performance and engagement
+- As a business owner, I want insights into my content strategy effectiveness
 
-- `SchedulingView.tsx` - Calendar and scheduling interface
-- `TweetCalendar.tsx` - Task timeline view
+**Acceptance Criteria**:
+- Monthly/weekly calendar view of scheduled tweets
+- Drag-and-drop rescheduling functionality
+- Basic analytics dashboard showing tweet performance
+- Engagement metrics (likes, retweets, replies, impressions)
+- Content performance insights and recommendations
+- Export analytics data for reporting
 
-**Dashboard Components:**
-- `DashboardView.tsx` - Main dashboard with task overview
-- `StatsCard.tsx` - Metrics and statistics cards
-- `MediaLibraryView.tsx` - File and media management
-- `NotificationDropdown.tsx` - Real-time notifications
+## 🔐 Authentication & Security
 
-**Mobile-First Design:**
-- `MobileDashboard.tsx` - Mobile dashboard layout
-- `MobileHeader.tsx` - Mobile navigation header
-- `MobileTweetComposer.tsx` - Mobile task creation
-- Responsive design patterns throughout
+### User Authentication (Leverages Existing System)
+- Email/password registration and login (already implemented)
+- Google OAuth sign-in/sign-up integration (ready to uncomment in main.wasp)
+- Email verification for new accounts (already implemented)
+- Password reset functionality (already implemented)
+- Secure session management (already implemented)
+- Admin user system (already implemented)
 
-## Application Structure (Respecting Wasp.sh Conventions)
+### Twitter Integration Security
+- OAuth 2.0 with PKCE for Twitter account linking
+- Encrypted storage of Twitter access tokens
+- Automatic token refresh handling
+- Secure API communication with Twitter
+- User consent for Twitter permissions
 
-### Frontend Architecture (Wasp Client Structure)
-```
-src/
-├── components/ui/          # Reusable UI components (Shadcn/ui)
-├── client/                 # Client-side application logic (Wasp structure)
-├── auth/                   # Authentication components (Wasp auth)
-├── app/                    # Main app features (renamed from demo-ai-app)
-├── file-upload/           # File management system (Wasp boilerplate)
-├── payment/               # Payment and subscription logic (Wasp boilerplate)
-├── user/                  # User profile and account management (Wasp)
-├── admin/                 # Administrative interfaces (Wasp boilerplate)
-├── landing-page/          # Marketing and landing pages (Wasp)
-├── analytics/             # Analytics and reporting (Wasp boilerplate)
-└── shared/                # Shared utilities and constants (Wasp)
-```
+### Data Security (Built on Existing Infrastructure)
+- HTTPS encryption for all communications (already implemented)
+- Secure storage of user data and media files (existing S3/R2 integration)
+- GDPR compliance for user data handling (existing user management)
+- Regular security audits and updates
+- Data backup and recovery procedures
+- Secure API key storage for custom OpenAI configurations
 
-### Backend Architecture (Wasp Server Structure)
-```
-server/
-├── operations/            # Wasp operations (queries/actions)
-├── scripts/               # Database seeds and utilities
-├── validation/            # Input validation schemas
-└── utils/                 # Server-side utilities
-```
+## 🛠️ Technical Architecture
 
+### Frontend Technology Stack
+- React with TypeScript (strict typing, no 'any' types)
+- Wasp framework for full-stack type safety
+- Tailwind CSS for styling
+- React Hook Form for form management
+- React Query for API state management
 
-## Custom LLM Integration
+### Backend Technology Stack (Leverages Existing)
+- Node.js with TypeScript (already configured)
+- Wasp framework for API generation (already configured)
+- Prisma ORM for database operations (already configured)
+- PostgreSQL for primary database (already configured with real credentials)
+- PgBoss for job scheduling (already configured for cron jobs)
+- Existing analytics and admin systems
 
-### LLM Provider Support
-**Supported Providers:**
-- OpenAI (with custom model and base url)
-- Custom API endpoints
-- Google AI (Gemini)
+### External Integrations
+- **OpenAI API**: Content generation and image analysis (already integrated, extend existing)
+- **Twitter API v2**: Tweet posting and account management
+- **Cloudflare R2**: Media storage and CDN (S3-compatible, already configured)
+- **Stripe/LemonSqueezy**: Payment processing for subscriptions (already implemented)
+- **Google OAuth**: User authentication (ready to enable)
+- **Analytics providers**: Google Analytics, Plausible (already configured)
 
-**Configuration Options:**
-- Custom base URLs for API endpoints
-- Model selection and parameters
-- Temperature, max tokens, top-p settings
-- Custom headers and authentication
-- Rate limiting and retry logic
+### Infrastructure
+- Cloudflare for CDN and DDoS protection
+- Automated deployments with CI/CD
+- Environment-based configuration
+- Monitoring and logging systems
+- Automated backups and disaster recovery
 
-**Components:**
-- `LlmSettings.tsx` - LLM provider configuration
-- `ModelSelector.tsx` - Model selection interface
-- `CustomEndpointForm.tsx` - Custom API configuration
-- `llmConfig.ts` - LLM configuration management
+## 📊 API Integrations
 
-## Component Integration Flow (Wasp-Compliant)
+### Twitter API v2 (Free Tier)
+- **Rate Limits**: 1,500 tweets per month, 300 requests per 15-minute window
+- **Endpoints Used**:
+  - POST /2/tweets (create tweets)
+  - GET /2/users/me (user profile)
+  - GET /2/users/:id/tweets (user tweets)
+  - POST /1.1/media/upload (media upload)
+- **OAuth Scope**: tweet.read tweet.write users.read offline.access
 
-### 1. Social Media Post Creation Flow
-1. User inputs post via `TweetComposer.tsx` interface
-2. ElizaOS agent processes natural language input (on hold)
-3. `generateLlmResponse` operation calls configured LLM provider
-4. Structured post data returned and stored
-5. UI updates with new post and AI suggestions
+### OpenAI API (Extends Existing Integration)
+- Text generation for tweet content (extends existing GPT integration)
+- Image analysis for contextual content creation
+- Content improvement suggestions
+- Multi-modal AI capabilities
+- Support for custom API keys and base URLs
+- Custom model selection (GPT-4, GPT-3.5-turbo, fine-tuned models)
 
-### 2. File Upload Flow (Wasp Boilerplate)
-1. User selects file in `FileUploadPage.tsx`
-2. File validation occurs client-side
-3. `createFile` operation generates S3 signed URL
-4. Direct upload to S3 with progress tracking
-5. File metadata stored in database
+### Cloudflare R2 Storage
+- S3-compatible API for seamless integration
+- Zero egress fees for cost optimization
+- Global CDN for fast media delivery
+- Automatic backup and versioning
 
-### 3. Payment Flow (Wasp Boilerplate)
-1. User selects plan on `PricingPage.tsx`
-2. `generateCheckoutSession` creates payment session
-3. Redirect to payment processor
-4. Webhook processes payment completion
-5. User subscription status updated
+## 💰 Monetization Strategy
 
-### 4. Admin Analytics Flow (Wasp Boilerplate)
-1. Daily stats job aggregates data
-2. `AnalyticsDashboardPage.tsx` queries metrics
-3. Real-time charts and cards display data
-4. Admin can drill down into specific metrics
+### Freemium Model (No Credit System)
+**Free Tier**:
+- Bring your own OpenAI API key for unlimited AI generation
+- 1 connected Twitter account
+- Basic scheduling (up to 10 scheduled tweets)
+- 1 AI agent
+- 100MB media storage (leverages existing file-upload system)
 
-## ElizaOS Agent Integration Points
+**Pro Tier ($9.99/month)**:
+- Unlimited AI-generated tweets using platform's OpenAI key
+- 3 connected Twitter accounts
+- Unlimited scheduling
+- 5 AI agents with custom training
+- 1GB media storage
+- Basic analytics dashboard (extends existing analytics system)
 
-### 1. Post Processing
-- Natural language post input parsing
-- Post complexity analysis and estimation
-- Automatic post categorization and tagging
-- Dependency detection and suggestion
+**Business Tier ($29.99/month)**:
+- Unlimited AI-generated tweets using platform's OpenAI key
+- 10 connected Twitter accounts
+- Advanced scheduling with optimal time suggestions
+- Unlimited AI agents
+- 10GB media storage
+- Advanced analytics and reporting
+- Priority customer support
+- Custom OpenAI base URL support (Azure OpenAI, local models)
 
-### 2. Schedule Optimization
-- AI-powered daily schedule generation
-- Priority-based post ordering
-- Time block optimization
-- Conflict resolution and suggestions
+## 🎨 User Experience Design
 
-### 3. User Assistance
-- Contextual help and guidance
-- Task completion suggestions
-- Productivity insights and recommendations
-- Automated follow-up and reminders
+### Design Principles
+- Clean, intuitive interface focused on content creation
+- Mobile-first responsive design
+- Accessibility compliance (WCAG 2.1 AA)
+- Consistent design system with reusable components
+- Fast loading times and smooth interactions
 
-## Technology Stack Integration (Wasp-Based)
+### Key User Flows
+1. **Onboarding**: Account creation → Twitter connection → First tweet generation
+2. **Content Creation**: AI prompt → Content generation → Media upload → Scheduling
+3. **Bulk Scheduling**: Calendar view → Batch content creation → Schedule optimization
+4. **Analytics Review**: Dashboard → Performance metrics → Content insights
 
-### Frontend (Wasp Client)
-- **React 18** with TypeScript for type safety
-- **Tailwind CSS** for styling with **Shadcn/ui** components
-- **Wasp client** for API integration and routing
-- **Lucide React** for consistent iconography
-- **Twitter-like UI patterns** from task3 repo
+## 📈 Success Metrics
 
-### Backend (Wasp Server)
-- **Wasp framework** for full-stack coordination
-- **Prisma ORM** for type-safe database operations
-- **PostgreSQL** for data persistence
-- **ElizaOS** for AI agent capabilities
-- **PgBoss** for job scheduling (Wasp built-in)
+### User Engagement
+- Daily/Monthly Active Users (DAU/MAU)
+- Tweet generation frequency per user
+- Scheduled tweet completion rate
+- User retention rates (7-day, 30-day)
 
-### External Services
-- **Custom LLM APIs** with configurable endpoints
-- **AWS S3** for file storage (Wasp boilerplate)
-- **Stripe/Lemon Squeezy** for payment processing (Wasp boilerplate)
-- **Email services** for notifications (Wasp boilerplate)
+### Business Metrics
+- Conversion rate from free to paid plans
+- Monthly Recurring Revenue (MRR)
+- Customer Acquisition Cost (CAC)
+- Customer Lifetime Value (CLV)
+- Churn rate by plan tier
 
-## Development and Deployment (Wasp Workflow)
+### Product Performance
+- AI content generation success rate
+- Tweet scheduling accuracy
+- Media optimization efficiency
+- API response times and uptime
 
-### Development Setup
-- Wasp development server with hot reload
-- PostgreSQL database with Prisma migrations
-- Environment configuration for API keys and LLM endpoints
-- Local S3 simulation for file testing
+## 🚀 Development Roadmap
 
-### Production Deployment
-- Wasp build and deployment pipeline
-- Database migration management
-- Environment variable configuration
-- CDN integration for static assets
+### Phase 1: MVP (Months 1-2) - Extend Existing Systems
+- Extend existing auth system (uncomment Google OAuth)
+- Transform existing AI system for tweet generation (remove credits, add custom keys)
+- Simple tweet scheduling using existing job system
+- Twitter account connection and posting
+- Extend existing file-upload for Twitter media optimization
 
-## Key Wasp.sh Conventions Maintained
+### Phase 2: Core Features (Months 3-4) - Build on Foundation
+- Custom AI agents with personality training (extends existing AI system)
+- Advanced scheduling with calendar interface
+- Media library using existing file management
+- Extend existing analytics dashboard for Twitter metrics
+- Extend existing payment system for Twitter-specific plans
 
-### 1. File Structure
-- Maintains Wasp's src/ directory structure
-- Preserves Wasp's operation patterns (queries/actions)
-- Keeps Wasp's entity relationships intact
-- Follows Wasp's page and route definitions
+### Phase 3: Advanced Features (Months 5-6)
+- Optimal posting time recommendations
+- Advanced analytics and reporting
+- Bulk content creation and scheduling
+- Mobile app development
+- API for third-party integrations
 
-### 2. Authentication
-- Uses Wasp's built-in auth system
-- Maintains email verification flow
-- Preserves admin role checking patterns
-- Keeps Wasp's user entity structure
+### Phase 4: Scale & Optimize (Months 7+)
+- Advanced AI features and improvements
+- Enterprise features for larger teams
+- Integration with other social media platforms
+- Advanced analytics and AI insights
+- Performance optimization and scaling
 
-### 3. Database
-- Uses Wasp's Prisma integration
-- Maintains existing entity relationships
-- Preserves Wasp's migration patterns
-- Keeps Wasp's seeding structure
+## 🔧 Technical Requirements
 
-### 4. Operations
-- Follows Wasp's query/action patterns
-- Maintains Wasp's entity access control
-- Preserves Wasp's validation patterns
-- Keeps Wasp's error handling conventions
+### Performance Requirements
+- Page load times under 2 seconds
+- API response times under 500ms
+- 99.9% uptime availability
+- Support for 10,000+ concurrent users
+- Mobile-optimized performance
+
+### Security Requirements
+- SOC 2 Type II compliance
+- GDPR and CCPA compliance
+- Regular security audits and penetration testing
+- Encrypted data storage and transmission
+- Secure API authentication and authorization
+
+### Scalability Requirements
+- Horizontal scaling capability
+- Auto-scaling based on demand
+- Database optimization for large datasets
+- CDN integration for global performance
+- Microservices architecture for modularity
+
+## 📋 Acceptance Criteria Summary
+
+The xtasker platform will be considered successful when:
+- Users can generate high-quality tweet content using AI assistance
+- Content scheduling works reliably with accurate posting times
+- Media optimization reduces file sizes by 40-70% while maintaining quality
+- Twitter integration allows seamless posting without manual intervention
+- Analytics provide actionable insights for content strategy improvement
+- The platform maintains 99.9% uptime with fast response times
+- User onboarding is completed in under 5 minutes
+- Free-to-paid conversion rate exceeds 5%
